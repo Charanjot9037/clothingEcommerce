@@ -37,10 +37,10 @@ export default function Login() {
     if (res.ok) {
       alert("Login successful");
 
-      // save token
+   
       localStorage.setItem("token", data.token);
-
-      // redirect example
+    localStorage.setItem("userId", data.user.id);
+   
       window.location.href = "/";
     } else {
       alert(data.message);

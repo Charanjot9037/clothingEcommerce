@@ -1,10 +1,8 @@
 import mongoose from "mongoose";
 
-const MONGO_URI ='mongodb://localhost:27017/Clothshope';
 
-if (!MONGO_URI) {
-  throw new Error("Please define MONGO_URI");
-}
+
+
 
 let cached = global.mongoose;
 
@@ -16,7 +14,7 @@ export async function connectDB() {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGO_URI);
+    cached.promise = mongoose.connect(process.env.MONGO_URI);
   }
 
   cached.conn = await cached.promise;
