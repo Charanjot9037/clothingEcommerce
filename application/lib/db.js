@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 
 
 
-
 let cached = global.mongoose;
 
 if (!cached) {
