@@ -7,7 +7,7 @@ import Divider from "../elements/Divider";
 export default function Signup() {
   return (
     <div className="min-h-screen grid md:grid-cols-2">
-      {/* LEFT BRAND SIDE */}
+ 
       <div className="hidden md:flex flex-col justify-between bg-black text-white p-12">
         <h1 className="text-3xl font-bold">SHOP.CO</h1>
 
