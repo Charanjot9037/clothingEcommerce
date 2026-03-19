@@ -50,9 +50,15 @@ export default function MainPage() {
         ]}
       />
 
-      <BrandShowcase
-        brands={["VERSACE", "ZARA", "GUCCI", "PRADA", "Calvin Klein"]}
-      />
+     <BrandShowcase
+  brands={[
+    "/main/brand-1.svg",
+ "main/brand-2.svg",
+ "main/brand-3.svg",
+ "main/brand-4.svg",
+ "main/brand-5.svg"
+  ]}
+/>
     
 
     </div>
