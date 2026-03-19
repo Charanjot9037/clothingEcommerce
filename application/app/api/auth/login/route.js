@@ -1,5 +1,5 @@
-import { connectDB } from "@/lib/db";
-import User from "@/models/User";
+import { connectDB } from "../../../../lib/db";
+import User from "../../../../models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -10,6 +10,7 @@ export async function POST(req) {
     const { email, password } = await req.json();
 
     const user = await User.findOne({ email });
+    console.log(user);
 
     if (!user) {
       return Response.json(
@@ -18,10 +19,7 @@ export async function POST(req) {
       );
     }
 
-    const isMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return Response.json(
@@ -29,6 +27,7 @@ export async function POST(req) {
         { status: 401 }
       );
     }
+   
 
     const token = jwt.sign(
       { userId: user._id },
@@ -45,6 +44,7 @@ export async function POST(req) {
       },
     });
   } catch (error) {
+    console.log(error);
     return Response.json(
       { message: "Server error" },
       { status: 500 }
