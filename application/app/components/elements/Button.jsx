@@ -20,6 +20,7 @@ const Button = ({
     primary: "bg-blue-600 text-white hover:bg-blue-700",
     secondary: "bg-gray-200 text-gray-800 hover:bg-gray-300",
     outline: "border border-gray-300 hover:bg-gray-100",
+    dark:"bg-black hover:bg-black/10 text-white",
     ghost: "hover:bg-gray-100",
     danger: "bg-red-600 text-white hover:bg-red-700",
   };

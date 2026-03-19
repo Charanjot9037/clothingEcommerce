@@ -42,7 +42,7 @@ export default function MainPage() {
       <HeroSection
         title="FIND CLOTHES THAT MATCHES YOUR STYLE"
         description="Browse through our diverse range of garments designed to bring out your individuality."
-        image="/hero.png"
+      
         stats={[
           { number: "200+", label: "International Brands" },
           { number: "2,000+", label: "High Quality Products" },
