@@ -5,7 +5,8 @@ import Navbar from "../elements/Navbar";
 import HeroSection from "../elements/HeroSection";
 import BrandShowcase from "../elements/BrandShowcase";
 import ProductSection from "../elements/ProductSection";
-import { NAV_LINKS, NEW_ARRIVALS,TOP_SELLING,BRANDS, HERO_STATS} from "../../constants/mainPage";
+import DressStyleSection from "../elements/DressStyleSection";
+import { NAV_LINKS, NEW_ARRIVALS,TOP_SELLING,BRANDS, HERO_STATS,DRESS_STYLES} from "../../constants/mainPage";
 
 export default function MainPage() {
   return (
@@ -42,6 +43,10 @@ export default function MainPage() {
       products={TOP_SELLING}
       onViewAll={() => console.log("View All Clicked")}
     />
+    <DressStyleSection
+  title="BROWSE BY DRESS STYLE"
+  styles={DRESS_STYLES}
+/>
 
     </div>
   );

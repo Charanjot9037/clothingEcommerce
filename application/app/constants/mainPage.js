@@ -134,3 +134,25 @@ export const HERO_STATS = [
   { number: "2,000+", label: "High Quality Products" },
   { number: "30,000+", label: "Happy Customers" },
 ];
+export const DRESS_STYLES = [
+  {
+    id: "casual",
+ 
+    image: "/main/dressStyle/casual.png",
+  },
+  {
+    id: "formal",
+    
+    image: "/main/dressStyle/formal.png",
+  },
+  {
+    id: "party",
+  
+    image: "/main/dressStyle/party.png",
+  },
+  {
+    id: "gym",
+   
+    image: "/main/dressStyle/gym.png",
+  },
+];
