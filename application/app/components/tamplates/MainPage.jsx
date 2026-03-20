@@ -1,29 +1,13 @@
+
+"use client"
 import AnnouncementBar from "../elements/AnnouncementBar";
 import Navbar from "../elements/Navbar";
 import HeroSection from "../elements/HeroSection";
 import BrandShowcase from "../elements/BrandShowcase";
-export  const NAV_LINKS = [
-  {
-    label: "Shop",
-    dropdown: [
-      { label: "Men", href: "/shop/men" },
-      { label: "Women", href: "/shop/women" },
-      { label: "Kids", href: "/shop/kids" },
-    ],
-  },
-  {
-    label: "On Sale",
-    href: "/sale",
-  },
-  {
-    label: "New Arrivals",
-    href: "/new-arrivals",
-  },
-  {
-    label: "Brands",
-    href: "/brands",
-  },
-];
+import ProductSection from "../elements/ProductSection";
+import DressStyleSection from "../elements/DressStyleSection";
+import { NAV_LINKS, NEW_ARRIVALS,TOP_SELLING,BRANDS, HERO_STATS,DRESS_STYLES} from "../../constants/mainPage";
+
 export default function MainPage() {
   return (
     <div>
@@ -43,23 +27,26 @@ export default function MainPage() {
         title="FIND CLOTHES THAT MATCHES YOUR STYLE"
         description="Browse through our diverse range of garments designed to bring out your individuality."
       
-        stats={[
-          { number: "200+", label: "International Brands" },
-          { number: "2,000+", label: "High Quality Products" },
-          { number: "30,000+", label: "Happy Customers" },
-        ]}
+        stats={HERO_STATS}
       />
 
      <BrandShowcase
-  brands={[
-    "/main/brand-1.svg",
- "main/brand-2.svg",
- "main/brand-3.svg",
- "main/brand-4.svg",
- "main/brand-5.svg"
-  ]}
+  brands={BRANDS}
 />
-    
+  <ProductSection
+      title="NEW ARRIVALS"
+      products={NEW_ARRIVALS}
+      onViewAll={() => console.log("View All Clicked")}
+    />
+      <ProductSection
+      title="TOP SELLING"
+      products={TOP_SELLING}
+      onViewAll={() => console.log("View All Clicked")}
+    />
+    <DressStyleSection
+  title="BROWSE BY DRESS STYLE"
+  styles={DRESS_STYLES}
+/>
 
     </div>
   );
