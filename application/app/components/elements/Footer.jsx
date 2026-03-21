@@ -5,7 +5,7 @@ import { footerData } from "../../constants/footer";
 
 export default function Footer() {
   return (
-    <div className="bg-gray-100 pb-10 pt-4">
+    <div className="bg-gray-100 py-10">
       <Wrapper>
         <footer className="text-gray-600">
           {/* Main Footer */}

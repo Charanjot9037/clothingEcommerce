@@ -1,4 +1,5 @@
-export const testimonials = [
+
+export const testimonialsData = [
   {
     name: "Sarah M.",
     review:
@@ -14,7 +15,7 @@ export const testimonials = [
   {
     name: "James L.",
     review:
-      "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co. The selection is diverse and on-trend.",
+      "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co.",
     rating: 5,
   },
 ];

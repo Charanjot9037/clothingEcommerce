@@ -1,45 +1,104 @@
-import { testimonials } from "@/app/constants/testimonal";
-import { Star } from "lucide-react";
+"use client";
 
-export default function Testimonials() {
+import useEmblaCarousel from "embla-carousel-react";
+import { useCallback } from "react";
+import TestimonialCard from "../atoms/TestimonialCard";
+import Wrapper from "../atoms/Wrapper";
+
+const testimonialsData = [
+  {
+    name: "Sarah M.",
+    review:
+      "I'm blown away by the quality and style of the clothes I received from Shop.co. From casual wear to elegant dresses, every piece I've bought has exceeded my expectations.",
+    rating: 5,
+  },
+  {
+    name: "Alex K.",
+    review:
+      "Finding clothes that align with my personal style used to be a challenge until I discovered Shop.co. The range of options they offer is truly remarkable.",
+    rating: 5,
+  },
+  {
+    name: "James ",
+    review:
+      "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co.",
+    rating: 5,
+  },
+  {
+    name: "James g.",
+    review:
+      "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co.",
+    rating: 5,
+  },
+  {
+    name: "James L",
+    review:
+      "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co.",
+    rating: 5,
+  },
+  {
+    name: "James Lion.",
+    review:
+      "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co.",
+    rating: 5,
+  },
+  {
+    name: "JamLion.",
+    review:
+      "As someone who's always on the lookout for unique fashion pieces, I'm thrilled to have stumbled upon Shop.co.",
+    rating: 5,
+  },
+];
+export default function TestimonialsCarousel() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    align: "start",
+  });
+
+  const scrollPrev = useCallback(() => {
+    if (emblaApi) emblaApi.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
   return (
-    <section className="py-16">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl md:text-4xl font-bold">OUR HAPPY CUSTOMERS</h2>
+    <Wrapper>
+      <section className="py-16">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl md:text-4xl font-extrabold">
+            OUR HAPPY CUSTOMERS
+          </h2>
 
-        <div className="flex gap-3">
-          <button className="p-2 border rounded-full hover:bg-gray-100">
-            ←
-          </button>
-          <button className="p-2 border rounded-full hover:bg-gray-100">
-            →
-          </button>
-        </div>
-      </div>
-
-      <div className="flex gap-6 overflow-x-auto scrollbar-hide">
-        {testimonials.map((item) => (
-          <div
-            key={item.name}
-            className="min-w-[300px] md:min-w-[350px] bg-white border rounded-2xl p-6 shadow-sm"
-          >
-            <div className="flex gap-1 mb-3 text-yellow-500">
-              {Array.from({ length: item.rating }).map((_, i) => (
-                <Star key={i} size={16} fill="currentColor" />
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-semibold">{item.name}</h3>
-              <span className="text-green-500 text-sm">✔</span>
-            </div>
-
-            <p className="text-sm text-gray-500 leading-relaxed">
-              {item.review}
-            </p>
+          <div className="flex gap-3">
+            <button
+              onClick={scrollPrev}
+              className="p-2 rounded-full hover:bg-gray-100 transition"
+            >
+              ←
+            </button>
+            <button
+              onClick={scrollNext}
+              className="p-2 rounded-full hover:bg-gray-100 transition"
+            >
+              →
+            </button>
           </div>
-        ))}
-      </div>
-    </section>
+        </div>
+
+        <div className="overflow-hidden" ref={emblaRef}>
+          <div className="flex">
+            {testimonialsData.map((item) => (
+              <div
+                key={item.name}
+                className="flex-[0_0_100%] sm:flex-[0_0_50%] md:flex-[0_0_33.33%] px-3"
+              >
+                <TestimonialCard {...item} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </Wrapper>
   );
 }

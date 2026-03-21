@@ -6,6 +6,7 @@ import BrandShowcase from "../elements/BrandShowcase";
 import ProductSection from "../elements/ProductSection";
 import DressStyleSection from "../elements/DressStyleSection";
 import Testimonials from "../elements/Testimonial";
+import Newsletter from "../elements/Newsletter";
 import {
   NAV_LINKS,
   NEW_ARRIVALS,
@@ -45,6 +46,7 @@ export default function MainPage() {
       />
       <DressStyleSection title="BROWSE BY DRESS STYLE" styles={DRESS_STYLES} />
       <Testimonials />
+      <Newsletter />
       <Footer />
     </div>
   );
