@@ -1,62 +1,91 @@
-export const paymentMethods = [
-  "/global/footer/visa.svg",
-  "/global/footer/paypal.svg",
-  "/global/footer/pay.svg",
-  "/global/footer/gpay.svg",
-  "/global/footer/netbanking.svg",
-];
+export const footerData = {
+  social: [
+    {
+      name: "twitter",
+      src: "/global/footer/twitter.svg",
+      link: "#",
+    },
+    {
+      name: "facebook",
+      src: "/global/footer/facebook.svg",
+      link: "#",
+    },
+    {
+      name: "instagram",
+      src: "/global/footer/instagram.svg",
+      link: "#",
+    },
+    {
+      name: "github",
+      src: "/global/footer/github.svg",
+      link: "#",
+    },
+  ],
 
-// export const socialIcons = [
-//   "/global/footer/twitter.svg",
-//   "/global/footer/facebook.svg",
-//   "/global/footer/instagram.svg",
-//   "/global/footer/github.svg",
-// ];
-export const socialIcons = [
-  {
-    name: "twitter",
-    src: "/global/footer/twitter.svg",
-  },
-  {
-    name: "facebook",
-    src: "/global/footer/facebook.svg",
-  },
-  {
-    name: "instagram",
-    src: "/global/footer/instagram.svg",
-  },
-  {
-    name: "github",
-    src: "/global/footer/github.svg",
-  },
-];
+  payments: [
+    {
+      name: "visa",
+      src: "/global/footer/visa.svg",
+      link: "#",
+    },
+    {
+      name: "paypal",
+      src: "/global/footer/paypal.svg",
+      link: "#",
+    },
+    {
+      name: "pay",
+      src: "/global/footer/pay.svg",
+      link: "#",
+    },
+    {
+      name: "gpay",
+      src: "/global/footer/gpay.svg",
+      link: "#",
+    },
+    {
+      name: "netbanking",
+      src: "/global/footer/netbanking.svg",
+      link: "#",
+    },
+  ],
 
-export const footerSections = [
-  {
-    title: "COMPANY",
-    items: ["About", "Features", "Works", "Career"],
-  },
-  {
-    title: "HELP",
-    items: [
-      "Customer Support",
-      "Delivery Details",
-      "Terms & Conditions",
-      "Privacy Policy",
-    ],
-  },
-  {
-    title: "FAQ",
-    items: ["Account", "Manage Deliveries", "Orders", "Payments"],
-  },
-  {
-    title: "RESOURCES",
-    items: [
-      "Free eBooks",
-      "Development Tutorial",
-      "How to - Blog",
-      "Youtube Playlist",
-    ],
-  },
-];
-
+  sections: [
+    {
+      title: "COMPANY",
+      items: [
+        { label: "About", link: "#" },
+        { label: "Features", link: "#" },
+        { label: "Works", link: "#" },
+        { label: "Career", link: "#" },
+      ],
+    },
+    {
+      title: "HELP",
+      items: [
+        { label: "Customer Support", link: "#" },
+        { label: "Delivery Details", link: "#" },
+        { label: "Terms & Conditions", link: "#" },
+        { label: "Privacy Policy", link: "#" },
+      ],
+    },
+    {
+      title: "FAQ",
+      items: [
+        { label: "Account", link: "#" },
+        { label: "Manage Deliveries", link: "#" },
+        { label: "Orders", link: "#" },
+        { label: "Payments", link: "#" },
+      ],
+    },
+    {
+      title: "RESOURCES",
+      items: [
+        { label: "Free eBooks", link: "#" },
+        { label: "Development Tutorial", link: "#" },
+        { label: "How to - Blog", link: "#" },
+        { label: "Youtube Playlist", link: "#" },
+      ],
+    },
+  ],
+};

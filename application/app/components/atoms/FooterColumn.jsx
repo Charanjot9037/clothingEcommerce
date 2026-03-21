@@ -1,4 +1,3 @@
-
 export default function FooterColumn({ title, items }) {
   return (
     <div>
@@ -6,11 +5,13 @@ export default function FooterColumn({ title, items }) {
 
       <ul className="space-y-2 text-sm">
         {items.map((item) => (
-          <li
-            key={item}
-            className="hover:text-black cursor-pointer transition"
-          >
-            {item}
+          <li key={item.label}>
+            <a
+              href={item.link}
+              className="hover:text-black transition cursor-pointer"
+            >
+              {item.label}
+            </a>
           </li>
         ))}
       </ul>
