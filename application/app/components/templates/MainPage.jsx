@@ -8,7 +8,7 @@ import DressStyleSection from "../elements/DressStyleSection";
 import Testimonials from "../elements/Testimonial";
 import Newsletter from "../elements/Newsletter";
 import {
-  NAV_LINKS,
+ 
   NEW_ARRIVALS,
   TOP_SELLING,
   BRANDS,
@@ -25,7 +25,7 @@ export default function MainPage() {
         linkText="Sign Up Now"
       />
 
-      <Navbar logo="/global/logo.svg" links={NAV_LINKS} />
+    
 
       <HeroSection
         title="FIND CLOTHES THAT MATCHES YOUR STYLE"
