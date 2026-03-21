@@ -1,12 +1,11 @@
 
 "use client"
 import AnnouncementBar from "../elements/AnnouncementBar";
-import Navbar from "../elements/Navbar";
 import HeroSection from "../elements/HeroSection";
 import BrandShowcase from "../elements/BrandShowcase";
 import ProductSection from "../elements/ProductSection";
 import DressStyleSection from "../elements/DressStyleSection";
-import { NAV_LINKS, NEW_ARRIVALS,TOP_SELLING,BRANDS, HERO_STATS,DRESS_STYLES} from "../../constants/mainPage";
+import {  NEW_ARRIVALS,TOP_SELLING,BRANDS, HERO_STATS,DRESS_STYLES} from "../../constants/mainPage";
 
 export default function MainPage() {
   return (
@@ -18,11 +17,7 @@ export default function MainPage() {
 
      
 
-      <Navbar
-        logo="/global/logo.svg"
-        links={NAV_LINKS}
-      />
-
+    
       <HeroSection
         title="FIND CLOTHES THAT MATCHES YOUR STYLE"
         description="Browse through our diverse range of garments designed to bring out your individuality."
