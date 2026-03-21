@@ -1,5 +1,5 @@
 
-import MainPage from "./components/tamplates/MainPage";
+import MainPage from "./components/templates/MainPage";
 
 export default function Home() {
   return (
