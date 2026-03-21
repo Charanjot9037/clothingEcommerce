@@ -7,6 +7,7 @@ import BrandShowcase from "../elements/BrandShowcase";
 import ProductSection from "../elements/ProductSection";
 import DressStyleSection from "../elements/DressStyleSection";
 import { NAV_LINKS, NEW_ARRIVALS,TOP_SELLING,BRANDS, HERO_STATS,DRESS_STYLES} from "../../constants/mainPage";
+import Footer from '../elements/Footer';
 
 export default function MainPage() {
   return (
@@ -47,7 +48,7 @@ export default function MainPage() {
   title="BROWSE BY DRESS STYLE"
   styles={DRESS_STYLES}
 />
-
+<Footer/>
     </div>
   );
 }

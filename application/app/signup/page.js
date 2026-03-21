@@ -1,5 +1,5 @@
 import React from 'react'
-import Signup from '../components/tamplates/Signup'
+import Signup from '../components/templates/Signup'
 const page = () => {
   return (
     <>
