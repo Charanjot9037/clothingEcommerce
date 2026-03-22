@@ -21,7 +21,7 @@ export default async function ProductPage({ params }) {
   const { id } = await params; // ✅ await params (Next.js 15)
 
   const product = getProductById(id);
-
+console.log(product)
   if (!product) notFound(); // renders app/not-found.jsx
 
   const related = getRelatedProducts(product, 4);

@@ -3,14 +3,75 @@
 
 import { useState } from "react";
 import StarRating from "../../components/products/StarRating";
-
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { setCart as setReduxCart } from "../../store/slices/cartSlice";
 export default function ProductInfo({ product }) {
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedSize, setSelectedSize] = useState(2);
   const [qty, setQty] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState(""); // success / error message
 
+  const router = useRouter();
+
+  const dispatch = useDispatch();
   const colors = product.colors ?? ["#4a5c3d", "#2d3a2d", "#1a3458"];
-  const sizes = product.sizes ?? ["Small", "Medium", "Large", "X-Large"];
+  const sizes  = product.sizes  ?? ["Small", "Medium", "Large", "X-Large"];
+
+  // ─── Add to Cart Handler ───────────────────────────────
+  const handleAddToCart = async () => {
+    // 1. check login
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
+    // 2. decode JWT to get userId (no extra package needed)
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const userId  = payload.userId;
+
+    setLoading(true);
+    setFeedback("");
+
+    try {
+      const res = await fetch("/api/auth/cart/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          productId:     product.id,
+          title:         product.title,
+          image:         product.image,
+          price:         product.price,
+          oldPrice:      product.oldPrice   ?? null,
+          discount:      product.discount   ?? null,
+          category:      product.category   ?? null,
+          rating:        product.rating     ?? null,
+          selectedColor: colors[selectedColor],   // actual hex value e.g "#1a3458"
+          selectedSize:  sizes[selectedSize],     // actual label e.g "Medium"
+          quantity:      qty,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setFeedback("success");
+          dispatch(setReduxCart({ items: data.cart.items }));
+      } else {
+        setFeedback("error");
+      }
+    } catch (err) {
+      console.error(err);
+      setFeedback("error");
+    } finally {
+      setLoading(false);
+      // clear feedback after 2s
+      setTimeout(() => setFeedback(""), 2000);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-5">
@@ -106,8 +167,24 @@ export default function ProductInfo({ product }) {
           </button>
         </div>
 
-        <button className="flex-1 bg-black text-white py-3.5 rounded-full text-base font-semibold hover:opacity-85 transition-opacity">
-          Add to Cart
+        <button
+          onClick={handleAddToCart}
+          disabled={loading}
+          className={`flex-1 py-3.5 rounded-full text-base font-semibold transition-all ${
+            feedback === "success"
+              ? "bg-green-500 text-white"
+              : feedback === "error"
+              ? "bg-red-500 text-white"
+              : "bg-black text-white hover:opacity-85"
+          } disabled:opacity-60 disabled:cursor-not-allowed`}
+        >
+          {loading
+            ? "Adding..."
+            : feedback === "success"
+            ? "✓ Added to Cart"
+            : feedback === "error"
+            ? "✗ Failed, Try Again"
+            : "Add to Cart"}
         </button>
       </div>
     </div>
