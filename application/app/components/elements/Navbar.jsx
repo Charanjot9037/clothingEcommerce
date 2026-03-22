@@ -98,6 +98,12 @@ export default function Navbar({ logo, links }) {
                 <span className="hidden lg:block text-sm font-medium">{userName}</span>
               </div>
               <div className="absolute right-0 top-8 w-36 bg-white border border-gray-100 rounded-xl shadow-md opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
+              <button
+                  onClick={() => router.push("/orders")}
+                  className="w-full text-left px-4 py-2.5 text-sm text-black hover:bg-gray-50 rounded-xl"
+                >
+                  Orders
+                </button>
                 <button
                   onClick={handleLogout}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-gray-50 rounded-xl"
