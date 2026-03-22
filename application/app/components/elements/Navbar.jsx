@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { setCart } from "../../store/slices/cartSlice";
+import { setCart, clearCartState } from "../../store/slices/cartSlice";
 import Wrapper from "../atoms/Wrapper";
 import NavLinks from "../atoms/NavLinks";
 import SearchBar from "../atoms/SearchBar";
