@@ -6,19 +6,17 @@ import Image from "next/image";
 
 export default function ProductImages({ image, title }) {
   const [active, setActive] = useState(0);
-
-  // Generate 3 thumbnail variations (same image in real use — swap per product data)
   const thumbs = [image, image, image];
 
   return (
-    <div className="flex gap-4">
-      {/* Thumbnails */}
-      <div className="flex flex-col gap-3">
+    <div className="flex flex-col-reverse gap-4 sm:flex-row">
+      {/* Thumbnails — horizontal scroll on mobile, vertical on sm+ */}
+      <div className="flex flex-row sm:flex-col gap-3 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0">
         {thumbs.map((src, i) => (
           <button
             key={i}
             onClick={() => setActive(i)}
-            className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition-all ${
+            className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl overflow-hidden border-2 transition-all ${
               active === i
                 ? "border-black"
                 : "border-transparent hover:border-gray-300"
@@ -37,7 +35,7 @@ export default function ProductImages({ image, title }) {
       </div>
 
       {/* Main Image */}
-      <div className="flex-1 relative rounded-2xl overflow-hidden bg-gray-100 min-h-[420px]">
+      <div className="flex-1 relative rounded-2xl overflow-hidden bg-gray-100 min-h-[280px] sm:min-h-[380px] lg:min-h-[420px]">
         <Image
           src={image}
           alt={title}

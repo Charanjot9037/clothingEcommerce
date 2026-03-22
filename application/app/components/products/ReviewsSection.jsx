@@ -63,14 +63,14 @@ export default function ReviewsSection() {
   const [visibleCount, setVisibleCount] = useState(6);
 
   return (
-    <div className="px-20 pb-12">
+    <div className="px-4 sm:px-8 lg:px-20 pb-12">
       {/* Tabs */}
       <div className="flex border-b border-gray-200 mb-8">
         {TABS.map((tab, i) => (
           <button
             key={i}
             onClick={() => setActiveTab(i)}
-            className={`flex-1 py-4 text-center text-sm transition-all ${
+            className={`flex-1 py-4 text-center text-xs sm:text-sm transition-all ${
               activeTab === i
                 ? "text-black font-semibold border-b-2 border-black -mb-px"
                 : "text-gray-400 hover:text-black"
@@ -84,12 +84,12 @@ export default function ReviewsSection() {
       {activeTab === 1 && (
         <>
           {/* Header */}
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
             <h2 className="text-xl font-bold">
               All Reviews{" "}
               <span className="text-gray-400 font-normal text-base">(451)</span>
             </h2>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
@@ -106,7 +106,7 @@ export default function ReviewsSection() {
           </div>
 
           {/* Reviews Grid */}
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {REVIEWS.slice(0, visibleCount).map((review) => (
               <div
                 key={review.id}
@@ -122,9 +122,7 @@ export default function ReviewsSection() {
                 <p className="text-sm text-gray-500 leading-relaxed">
                   "{review.text}"
                 </p>
-                <p className="text-xs text-gray-400">
-                  Posted on {review.date}
-                </p>
+                <p className="text-xs text-gray-400">Posted on {review.date}</p>
               </div>
             ))}
           </div>
