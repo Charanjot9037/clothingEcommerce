@@ -3,7 +3,7 @@
 import Wrapper from "../atoms/Wrapper";
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { setCart as setReduxCart } from "../../store/slices/cartSlice"; // ← renamed to avoid conflict
+import { setCart as setReduxCart } from "../../store/slices/cartSlice";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Trash2, Minus, Plus, Tag, ArrowRight, ShoppingBag } from "lucide-react";
@@ -15,13 +15,14 @@ const PROMO_CODES = { SAVE10: 10, SAVE20: 20 };
 export default function CartSection() {
   const dispatch = useDispatch();
 
-  const [cart, setCart]                   = useState(null);  // ← local state, no conflict now
+  const [cart, setCart]                   = useState(null);
   const [loading, setLoading]             = useState(true);
   const [promoCode, setPromoCode]         = useState("");
   const [discount, setDiscount]           = useState(0);
   const [promoError, setPromoError]       = useState("");
   const [promoApplied, setPromoApplied]   = useState("");
   const [actionLoading, setActionLoading] = useState("");
+  const [checkoutLoading, setCheckoutLoading] = useState(false); // ← NEW
 
   const router = useRouter();
 
@@ -47,8 +48,8 @@ export default function CartSection() {
       const res  = await fetch("/api/auth/cart", { headers: authHeaders(token) });
       const data = await res.json();
       if (data.success) {
-        setCart(data.cart);                                           // ← local state for rendering
-        dispatch(setReduxCart({ items: data.cart.items ?? [] }));    // ← Redux for navbar badge
+        setCart(data.cart);
+        dispatch(setReduxCart({ items: data.cart.items ?? [] }));
       }
     } catch (err) {
       console.error(err);
@@ -64,10 +65,8 @@ export default function CartSection() {
       method: "PATCH",
       headers: authHeaders(token, true),
       body: JSON.stringify({
-        userId:        getUserId(token),
-        productId:     item.productId,
-        selectedColor: item.selectedColor,
-        selectedSize:  item.selectedSize,
+        userId: getUserId(token), productId: item.productId,
+        selectedColor: item.selectedColor, selectedSize: item.selectedSize,
       }),
     });
     await fetchCart();
@@ -81,10 +80,8 @@ export default function CartSection() {
       method: "PATCH",
       headers: authHeaders(token, true),
       body: JSON.stringify({
-        userId:        getUserId(token),
-        productId:     item.productId,
-        selectedColor: item.selectedColor,
-        selectedSize:  item.selectedSize,
+        userId: getUserId(token), productId: item.productId,
+        selectedColor: item.selectedColor, selectedSize: item.selectedSize,
       }),
     });
     await fetchCart();
@@ -98,10 +95,8 @@ export default function CartSection() {
       method: "DELETE",
       headers: authHeaders(token, true),
       body: JSON.stringify({
-        userId:        getUserId(token),
-        productId:     item.productId,
-        selectedColor: item.selectedColor,
-        selectedSize:  item.selectedSize,
+        userId: getUserId(token), productId: item.productId,
+        selectedColor: item.selectedColor, selectedSize: item.selectedSize,
       }),
     });
     await fetchCart();
@@ -118,23 +113,64 @@ export default function CartSection() {
     });
     await fetchCart();
     setActionLoading("");
-    setDiscount(0);
-    setPromoApplied("");
-    setPromoCode("");
+    setDiscount(0); setPromoApplied(""); setPromoCode("");
   };
 
   const handleApplyPromo = () => {
     const code = promoCode.trim().toUpperCase();
     if (PROMO_CODES[code]) {
-      setDiscount(PROMO_CODES[code]);
-      setPromoApplied(code);
-      setPromoError("");
+      setDiscount(PROMO_CODES[code]); setPromoApplied(code); setPromoError("");
     } else {
-      setPromoError("Invalid promo code");
-      setDiscount(0);
-      setPromoApplied("");
+      setPromoError("Invalid promo code"); setDiscount(0); setPromoApplied("");
     }
   };
+
+  // ─── STRIPE CHECKOUT ───────────────────────────────────────────────────────
+  const handleCheckout = async () => {
+    const token = getToken(); if (!token) return;
+    setCheckoutLoading(true);
+    try {
+      // 1. Create Stripe checkout session
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items, discount, deliveryFee: DELIVERY_FEE }),
+      });
+      const data = await res.json();
+      console.log("data from checkout session API", data);
+      if (!data.url) throw new Error("Failed to create checkout session");
+
+      // 2. Save order to DB before redirecting
+      await fetch("/api/auth/orders", {
+        method: "POST",
+        headers: authHeaders(token, true),
+        body: JSON.stringify({
+          items,
+          subtotal,
+          discount,
+          deliveryFee: DELIVERY_FEE,
+          total,
+          sessionId: data.url.split("cs_")[1]?.split("/")[0] ?? "",
+        }),
+      });
+
+      // 3. Clear cart
+      await fetch("/api/auth/cart/clear", {
+        method: "DELETE",
+        headers: authHeaders(token, true),
+        body: JSON.stringify({ userId: getUserId(token) }),
+      });
+
+      // 4. Redirect to Stripe hosted checkout
+      window.location.href = data.url;
+    } catch (err) {
+      console.error("Checkout error:", err);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+  // ───────────────────────────────────────────────────────────────────────────
 
   const items          = cart?.items ?? [];
   const subtotal       = items.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -160,7 +196,7 @@ export default function CartSection() {
 
   return (
     <Wrapper>
-      <div className="max-w-7xl mx-auto px-4 ">
+      <div className="max-w-7xl mx-auto px-4">
 
         {/* Breadcrumb */}
         <nav className="text-sm text-gray-400 mb-6 flex items-center gap-2">
@@ -188,7 +224,6 @@ export default function CartSection() {
             {items.map((item) => {
               const key       = `${item.productId}-${item.selectedColor}-${item.selectedSize}`;
               const isLoading = actionLoading.includes(item.productId);
-
               return (
                 <div
                   key={key}
@@ -196,12 +231,9 @@ export default function CartSection() {
                     isLoading ? "opacity-50 pointer-events-none" : ""
                   }`}
                 >
-                  {/* Image */}
                   <div className="w-30 h-30 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0 relative">
                     <Image src={item.image} alt={item.title} fill className="object-cover" />
                   </div>
-
-                  {/* Info */}
                   <div className="flex flex-col flex-1 gap-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-bold text-sm leading-snug truncate">{item.title}</h3>
@@ -209,7 +241,6 @@ export default function CartSection() {
                         <Trash2 size={23} />
                       </button>
                     </div>
-
                     <div className="flex flex-col gap-3 text-xs text-gray-400">
                       <span>Size: <span className="text-gray-600 font-medium">{item.selectedSize}</span></span>
                       <span className="flex items-center gap-1">
@@ -218,7 +249,6 @@ export default function CartSection() {
                       </span>
                       <span>Rating: <span className="text-gray-600 font-medium">{item.rating}</span></span>
                     </div>
-
                     <div className="flex items-center justify-between mt-auto pt-2">
                       <span className="font-bold text-base">${item.price * item.quantity}</span>
                       <div className="flex items-center gap-3 bg-gray-100 rounded-full px-4 py-1.5">
@@ -240,7 +270,6 @@ export default function CartSection() {
           {/* Order Summary */}
           <div className="bg-white border border-gray-100 rounded-2xl p-3 h-fit flex flex-col gap-5">
             <h2 className="text-lg font-bold">Order Summary</h2>
-
             <div className="flex flex-col gap-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-500">Subtotal</span>
@@ -264,31 +293,43 @@ export default function CartSection() {
             </div>
 
             {/* Promo */}
-      <div className="flex flex-col gap-2">
-  <div className="flex gap-2 ">
-    <div className="flex items-center gap-2 flex-1 min-w-0 border-2 border-gray-300 rounded-full px-4 py-2.5">
-      <Tag size={14} className="text-gray-400 flex-shrink-0" />
-      <input
-        type="text"
-        placeholder="Add promo code"
-        value={promoCode}
-        onChange={(e) => { setPromoCode(e.target.value); setPromoError(""); }}
-        className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
-      />
-    </div>
-    <button
-      onClick={handleApplyPromo}
-      className="bg-black text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0"
-    >
-      Apply
-    </button>
-  </div>
-  {promoError   && <p className="text-red-500 text-xs pl-2">{promoError}</p>}
-  {promoApplied && <p className="text-green-500 text-xs pl-2">✓ Code <strong>{promoApplied}</strong> applied — {discount}% off!</p>}
-</div>
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <div className="flex items-center gap-2 flex-1 min-w-0 border-2 border-gray-300 rounded-full px-4 py-2.5">
+                  <Tag size={14} className="text-gray-400 flex-shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Add promo code"
+                    value={promoCode}
+                    onChange={(e) => { setPromoCode(e.target.value); setPromoError(""); }}
+                    className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
+                  />
+                </div>
+                <button
+                  onClick={handleApplyPromo}
+                  className="bg-black text-white text-sm font-semibold px-5 py-2.5 rounded-full hover:opacity-80 transition-opacity whitespace-nowrap flex-shrink-0"
+                >
+                  Apply
+                </button>
+              </div>
+              {promoError   && <p className="text-red-500 text-xs pl-2">{promoError}</p>}
+              {promoApplied && <p className="text-green-500 text-xs pl-2">✓ Code <strong>{promoApplied}</strong> applied — {discount}% off!</p>}
+            </div>
 
-            <button className="w-full bg-black text-white py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:opacity-85 transition-opacity">
-              Go to Checkout <ArrowRight size={18} />
+            {/* ── CHECKOUT BUTTON ── */}
+            <button
+              onClick={handleCheckout}
+              disabled={checkoutLoading}
+              className="w-full bg-black text-white py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:opacity-85 transition-opacity disabled:opacity-50"
+            >
+              {checkoutLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Redirecting...
+                </>
+              ) : (
+                <>Go to Checkout <ArrowRight size={18} /></>
+              )}
             </button>
           </div>
 
