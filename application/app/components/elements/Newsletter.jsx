@@ -2,7 +2,7 @@ import Wrapper from "../atoms/Wrapper";
 export default function Newsletter() {
   return (
     <Wrapper>
-      <section className=" relative top-14">
+      <section className=" relative top-14 border-red-500 ">
         <div className="bg-black text-white rounded-3xl px-6 md:px-12 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <h2 className="text-2xl md:text-4xl font-extrabold leading-tight text-center md:text-left">
             STAY UP TO DATE ABOUT <br className="hidden md:block" />
