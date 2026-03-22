@@ -2,6 +2,8 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/elements/Navbar";
+import Footer from "./components/elements/Footer";
+import Newsletter from "./components/elements/Newsletter";
 import {NAV_LINKS} from "./constants/navbar";
 import {store} from "./store/store";
 import { Provider } from "react-redux";
@@ -23,6 +25,8 @@ export default function RootLayout({ children }) {
               />
         
         {children}
+           <Newsletter />
+      <Footer />
         </Provider>
       </body>
     </html>
