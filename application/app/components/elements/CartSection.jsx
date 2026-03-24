@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { setCart as setReduxCart } from "../../store/slices/cartSlice";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Trash2, Minus, Plus, Tag, ArrowRight, ShoppingBag } from "lucide-react";
+import {  Trash2, Minus, Plus, Tag, ArrowRight, ShoppingBag, User, MapPin, Globe, Phone  } from "lucide-react";
 import Link from "next/link";
 
 const DELIVERY_FEE = 15;
@@ -23,7 +23,15 @@ export default function CartSection() {
   const [promoApplied, setPromoApplied]   = useState("");
   const [actionLoading, setActionLoading] = useState("");
   const [checkoutLoading, setCheckoutLoading] = useState(false); // ← NEW
-
+const [address, setAddress] = useState({
+  fullName: "",
+  street:   "",
+  city:     "",
+  state:    "",
+  zip:      "",
+  country:  "",
+  phone:    "",
+});
   const router = useRouter();
 
   const getToken = () => {
@@ -291,7 +299,94 @@ export default function CartSection() {
                 <span>${total}</span>
               </div>
             </div>
+{/* ── DELIVERY ADDRESS ── */}
+<div className="flex flex-col gap-3">
+  <h3 className="text-sm font-semibold text-gray-700">Delivery Address</h3>
 
+  {/* Full Name */}
+  <div className="flex items-center gap-2 border-2 border-gray-300 rounded-full px-4 py-2.5">
+    <User size={14} className="text-gray-400 flex-shrink-0" />
+    <input
+      type="text"
+      placeholder="Full Name"
+      value={address.fullName}
+      onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
+      className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
+    />
+  </div>
+
+  {/* Street Address */}
+  <div className="flex items-center gap-2 border-2 border-gray-300 rounded-full px-4 py-2.5">
+    <MapPin size={14} className="text-gray-400 flex-shrink-0" />
+    <input
+      type="text"
+      placeholder="Street Address"
+      value={address.street}
+      onChange={(e) => setAddress({ ...address, street: e.target.value })}
+      className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
+    />
+  </div>
+
+  {/* City + State + ZIP — compact row */}
+  <div className="flex gap-2">
+    <div className="flex items-center gap-2 border-2 border-gray-300 rounded-full px-4 py-2.5 flex-1 min-w-0">
+      <input
+        type="text"
+        placeholder="City"
+        value={address.city}
+        onChange={(e) => setAddress({ ...address, city: e.target.value })}
+        className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
+      />
+    </div>
+    <div className="flex items-center gap-2 border-2 border-gray-300 rounded-full px-4 py-2.5 w-24 flex-shrink-0">
+      <input
+        type="text"
+        placeholder="State"
+        value={address.state}
+        onChange={(e) => setAddress({ ...address, state: e.target.value })}
+        className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
+      />
+    </div>
+    <div className="flex items-center gap-2 border-2 border-gray-300 rounded-full px-4 py-2.5 w-24 flex-shrink-0">
+      <input
+        type="text"
+        placeholder="ZIP"
+        value={address.zip}
+        onChange={(e) => setAddress({ ...address, zip: e.target.value })}
+        className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
+      />
+    </div>
+  </div>
+
+  {/* Country */}
+  <div className="flex items-center gap-2 border-2 border-gray-300 rounded-full px-4 py-2.5">
+    <Globe size={14} className="text-gray-400 flex-shrink-0" />
+    <select
+      value={address.country}
+      onChange={(e) => setAddress({ ...address, country: e.target.value })}
+      className="text-sm outline-none bg-transparent text-gray-700 w-full appearance-none cursor-pointer"
+    >
+      <option value="">Select Country</option>
+      <option value="US">United States</option>
+      <option value="IN">India</option>
+      <option value="GB">United Kingdom</option>
+      <option value="CA">Canada</option>
+      <option value="AU">Australia</option>
+    </select>
+  </div>
+
+  {/* Phone */}
+  <div className="flex items-center gap-2 border-2 border-gray-300 rounded-full px-4 py-2.5">
+    <Phone size={14} className="text-gray-400 flex-shrink-0" />
+    <input
+      type="tel"
+      placeholder="Phone Number"
+      value={address.phone}
+      onChange={(e) => setAddress({ ...address, phone: e.target.value })}
+      className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
+    />
+  </div>
+</div>
             {/* Promo */}
             <div className="flex flex-col gap-2">
               <div className="flex gap-2">
