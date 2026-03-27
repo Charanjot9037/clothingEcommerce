@@ -7,8 +7,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
+    console.log("process : ",process.env.STRIPE_SECRET_KEY)
     if (!process.env.STRIPE_SECRET_KEY) {
-  console.error("STRIPE_SECRET_KEY is missing!");
+
+  // console.error("STRIPE_SECRET_KEY is missing!");
 }
     const { items, discount, deliveryFee } = await req.json();
 
@@ -17,13 +19,12 @@ export async function POST(req) {
         currency: "usd",
         product_data: {
           name: item.title,
-          // images: [item.image],
           metadata: {
             size: item.selectedSize,
             color: item.selectedColor,
           },
         },
-        unit_amount: Math.round(item.price * 100), // Stripe uses cents
+        unit_amount: Math.round(item.price * 100), 
       },
       quantity: item.quantity,
     }));
@@ -42,8 +43,8 @@ export async function POST(req) {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/orders?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cart?cancelled=true`,
+      success_url: `${process.env.BASE_URL}/orders?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.BASE_URL}/cart?cancelled=true`,
       metadata: {
         discount: discount.toString(),
       },

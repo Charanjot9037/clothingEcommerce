@@ -15,7 +15,7 @@ export async function POST(req) {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     console.log("🔑 Decoded JWT:", decoded);
 
-    const { items, subtotal, discount, deliveryFee, total, sessionId } = await req.json();
+    const { items, subtotal, discount, deliveryFee, total, sessionId,  address } = await req.json();
 
     const order = await Order.create({
       userId:          decoded.userId ?? decoded.id,
@@ -24,6 +24,8 @@ export async function POST(req) {
       discount,
       deliveryFee,
       total,
+      deliveryStatus: "pending",
+      address,
       stripeSessionId: sessionId ?? "",
       status:          "paid",
     });
