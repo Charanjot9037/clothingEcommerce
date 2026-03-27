@@ -9,11 +9,11 @@ export  const NAV_LINKS = [
   },
   {
     label: "On Sale",
-    href: "/sale",
+    href: "/shop/top-selling",
   },
   {
     label: "New Arrivals",
-    href: "/new-arrivals",
+    href: "/shop/new-arrivals",
   },
   {
     label: "Brands",

@@ -1,12 +1,10 @@
 "use client";
 import AnnouncementBar from "../elements/AnnouncementBar";
-import Navbar from "../elements/Navbar";
 import HeroSection from "../elements/HeroSection";
 import BrandShowcase from "../elements/BrandShowcase";
 import ProductSection from "../elements/ProductSection";
 import DressStyleSection from "../elements/DressStyleSection";
 import Testimonials from "../elements/Testimonial";
-import Newsletter from "../elements/Newsletter";
 import {
  
   NEW_ARRIVALS,
@@ -46,8 +44,7 @@ export default function MainPage() {
       />
       <DressStyleSection title="BROWSE BY DRESS STYLE" styles={DRESS_STYLES} />
       <Testimonials />
-      <Newsletter />
-      <Footer />
+   
     </div>
   );
 }

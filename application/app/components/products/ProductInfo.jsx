@@ -150,43 +150,44 @@ export default function ProductInfo({ product }) {
       <hr className="border-gray-200" />
 
       {/* Quantity + Add to Cart */}
-      <div className="flex gap-4 items-center">
-        <div className="flex items-center gap-4 bg-gray-100 rounded-full px-5 py-3">
-          <button
-            onClick={() => setQty((q) => Math.max(1, q - 1))}
-            className="text-xl leading-none font-medium"
-          >
-            −
-          </button>
-          <span className="text-base font-medium w-5 text-center">{qty}</span>
-          <button
-            onClick={() => setQty((q) => q + 1)}
-            className="text-xl leading-none font-medium"
-          >
-            +
-          </button>
-        </div>
+      {/* Quantity + Add to Cart */}
+<div className="flex flex-wrap gap-4 items-center">
+  <div className="flex items-center gap-4 bg-gray-100 rounded-full px-5 py-3">
+    <button
+      onClick={() => setQty((q) => Math.max(1, q - 1))}
+      className="text-xl leading-none font-medium"
+    >
+      −
+    </button>
+    <span className="text-base font-medium w-5 text-center">{qty}</span>
+    <button
+      onClick={() => setQty((q) => q + 1)}
+      className="text-xl leading-none font-medium"
+    >
+      +
+    </button>
+  </div>
 
-        <button
-          onClick={handleAddToCart}
-          disabled={loading}
-          className={`flex-1 py-3.5 rounded-full text-base font-semibold transition-all ${
-            feedback === "success"
-              ? "bg-green-500 text-white"
-              : feedback === "error"
-              ? "bg-red-500 text-white"
-              : "bg-black text-white hover:opacity-85"
-          } disabled:opacity-60 disabled:cursor-not-allowed`}
-        >
-          {loading
-            ? "Adding..."
-            : feedback === "success"
-            ? "✓ Added to Cart"
-            : feedback === "error"
-            ? "✗ Failed, Try Again"
-            : "Add to Cart"}
-        </button>
-      </div>
+  <button
+    onClick={handleAddToCart}
+    disabled={loading}
+    className={`flex-1 min-w-[160px] py-3.5 rounded-full text-base font-semibold transition-all ${
+      feedback === "success"
+        ? "bg-green-500 text-white"
+        : feedback === "error"
+        ? "bg-red-500 text-white"
+        : "bg-black text-white hover:opacity-85"
+    } disabled:opacity-60 disabled:cursor-not-allowed`}
+  >
+    {loading
+      ? "Adding..."
+      : feedback === "success"
+      ? "✓ Added to Cart"
+      : feedback === "error"
+      ? "✗ Failed, Try Again"
+      : "Add to Cart"}
+  </button>
+</div>
     </div>
   );
 }

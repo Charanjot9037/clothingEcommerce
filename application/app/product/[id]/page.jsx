@@ -18,18 +18,15 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ProductPage({ params }) {
-  const { id } = await params; // ✅ await params (Next.js 15)
-
+  const { id } = await params;
   const product = getProductById(id);
-console.log(product)
-  if (!product) notFound(); // renders app/not-found.jsx
-
+  if (!product) notFound();
   const related = getRelatedProducts(product, 4);
 
   return (
     <main>
       {/* Breadcrumb */}
-      <nav className="px-20 py-4 text-sm text-gray-400 flex gap-2 items-center">
+      <nav className="px-4 sm:px-8 lg:px-20 py-4 text-sm text-gray-400 flex gap-2 items-center flex-wrap">
         <Link href="/" className="hover:text-black transition-colors">Home</Link>
         <span>›</span>
         <Link href="/shop" className="hover:text-black transition-colors">Shop</Link>
@@ -40,7 +37,7 @@ console.log(product)
       </nav>
 
       {/* Product Main Section */}
-      <section className="grid grid-cols-2 gap-16 px-20 pb-16">
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 px-4 sm:px-8 lg:px-20 pb-16">
         <ProductImages image={product.image} title={product.title} />
         <ProductInfo product={product} />
       </section>
@@ -51,7 +48,7 @@ console.log(product)
       {/* Related Products */}
       {related.length > 0 && (
         <>
-          <hr className="border-gray-100 mx-20" />
+          <hr className="border-gray-100 mx-4 sm:mx-8 lg:mx-20" />
           <div className="py-12">
             <RelatedProducts products={related} />
           </div>

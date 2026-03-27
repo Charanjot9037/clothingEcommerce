@@ -10,6 +10,16 @@ const orderItemSchema = new mongoose.Schema({
   selectedColor: String,
 });
 
+const addressSchema = new mongoose.Schema({
+  fullName: String,
+  street:   String,
+  city:     String,
+  state:    String,
+  zip:      String,
+  country:  String,
+  phone:    String,
+});
+
 const orderSchema = new mongoose.Schema(
   {
     userId:          { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -20,6 +30,8 @@ const orderSchema = new mongoose.Schema(
     total:           Number,
     stripeSessionId: String,
     status:          { type: String, default: "paid" },
+    deliveryStatus:  { type: String, default: "pending" }, 
+    address:         addressSchema,
   },
   { timestamps: true }
 );
