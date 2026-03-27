@@ -24,7 +24,7 @@ export async function POST(req) {
       email,
       password: hashedPassword,
     });
-
+console.log(user)
     return Response.json({
       message: "User created",
       user: {
@@ -33,9 +33,10 @@ export async function POST(req) {
       },
     });
   } catch (error) {
-    return Response.json(
-      { message: "Server error" },
-      { status: 500 }
-    );
-  }
+  console.error("SIGNUP ERROR:", error);
+  return Response.json(
+    { message: error.message },
+    { status: 500 }
+  );
+}
 }
