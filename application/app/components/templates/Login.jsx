@@ -6,7 +6,6 @@ import Button from "../elements/Button";
 import Divider from "../elements/Divider";
 
 export default function Login() {
-
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -31,17 +30,20 @@ export default function Login() {
     });
 
     const data = await res.json();
-
+console.log("isAdmin:", data.isAdmin);
     console.log(data);
 
     if (res.ok) {
       alert("Login successful");
 
-   
       localStorage.setItem("token", data.token);
-    localStorage.setItem("userId", data.user.id);
-   
-      window.location.href = "/";
+      localStorage.setItem("userId", data.user.id);
+
+      if (data.isAdmin) {
+        window.location.href = "/admin";
+      } else {
+        window.location.href = "/";
+      }
     } else {
       alert(data.message);
     }
@@ -49,7 +51,6 @@ export default function Login() {
 
   return (
     <div className="min-h-screen grid md:grid-cols-2">
-
       {/* LEFT SIDE */}
       <div className="hidden md:flex flex-col justify-between bg-black text-white p-12">
         <h1 className="text-3xl font-bold">SHOP.CO</h1>
@@ -75,13 +76,11 @@ export default function Login() {
       {/* RIGHT SIDE */}
       <div className="flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
-
           <h2 className="text-3xl font-bold mb-2">Welcome Back</h2>
 
           <p className="text-gray-500 mb-6">Login to continue shopping</p>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-
             <Input
               label="Email"
               name="email"
@@ -107,7 +106,6 @@ export default function Login() {
             >
               Login
             </Button>
-
           </form>
 
           <Divider />
@@ -121,10 +119,8 @@ export default function Login() {
               Sign Up
             </Link>
           </p>
-
         </div>
       </div>
-
     </div>
   );
 }
