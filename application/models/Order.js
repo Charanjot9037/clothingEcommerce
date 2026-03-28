@@ -25,6 +25,7 @@ const orderSchema = new mongoose.Schema(
     userId:          { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     items:           [orderItemSchema],
     subtotal:        Number,
+    name:            String,
     discount:        Number,
     deliveryFee:     Number,
     total:           Number,

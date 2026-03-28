@@ -3,30 +3,39 @@ import { connectDB } from "@/lib/db";
 import Product from "@/models/Product";
 import jwt from "jsonwebtoken";
 
+// ✅ Fix 2: try-catch so invalid tokens return null instead of throwing
 function verifyAdmin(req) {
-  const authHeader = req.headers.get("authorization");
-  const token = authHeader?.split(" ")[1];
-  if (!token) return null;
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  if (!decoded.isAdmin) return null;
-  return decoded;
+  try {
+    const authHeader = req.headers.get("authorization");
+    const token = authHeader?.split(" ")[1];
+    if (!token) return null;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.isAdmin) return null;
+    return decoded;
+  } catch {
+    return null;
+  }
 }
 
-// PATCH /api/products/[id] — edit product (admin only)
-export async function PATCH(req, { params }) {
+// ✅ Fix 1: await context.params — required in Next.js 15
+export async function PATCH(req, context) {
   try {
     await connectDB();
     if (!verifyAdmin(req)) return Response.json({ success: false, message: "Unauthorized" }, { status: 401 });
 
+    const { id } = await context.params;
+
     const updates = await req.json();
-    if (updates.price)    updates.price    = Number(updates.price);
-    if (updates.oldPrice) updates.oldPrice = Number(updates.oldPrice);
-    if (updates.stock)    updates.stock    = Number(updates.stock);
+    if (updates.price    != null) updates.price    = Number(updates.price);
+    if (updates.oldPrice != null) updates.oldPrice = Number(updates.oldPrice);
+    if (updates.stock    != null) updates.stock    = Number(updates.stock);
+    if (updates.discount != null) updates.discount = Number(updates.discount);
+    if (updates.rating   != null) updates.rating   = Number(updates.rating);
 
     const product = await Product.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: updates },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
     if (!product) return Response.json({ success: false, message: "Product not found" }, { status: 404 });
@@ -37,13 +46,17 @@ export async function PATCH(req, { params }) {
   }
 }
 
-// DELETE /api/products/[id] — remove product (admin only)
-export async function DELETE(req, { params }) {
+// ✅ Fix 1: await context.params — required in Next.js 15
+export async function DELETE(req, context) {
   try {
     await connectDB();
     if (!verifyAdmin(req)) return Response.json({ success: false, message: "Unauthorized" }, { status: 401 });
 
-    await Product.findByIdAndDelete(params.id);
+    const { id } = await context.params;
+
+    const product = await Product.findByIdAndDelete(id);
+    if (!product) return Response.json({ success: false, message: "Product not found" }, { status: 404 });
+
     return Response.json({ success: true, message: "Product deleted" });
   } catch (err) {
     console.error("DELETE /api/products/:id error:", err.message);
