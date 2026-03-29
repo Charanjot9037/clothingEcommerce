@@ -59,7 +59,7 @@ export async function DELETE(req, context) {
 
     return Response.json({ success: true, message: "Product deleted" });
   } catch (err) {
-    console.error("DELETE /api/products/:id error:", err.message);
+   
     return Response.json({ success: false, message: err.message }, { status: 500 });
   }
 }

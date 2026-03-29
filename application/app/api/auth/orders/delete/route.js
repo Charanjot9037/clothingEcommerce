@@ -11,17 +11,16 @@ export async function DELETE(req) {
     if (!token) return Response.json({ success: false, message: "Unauthorized" }, { status: 401 });
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded)
+
     const { orderId } = await req.json();
 
     const order = await Order.findById(orderId);
     if (!order) return Response.json({ success: false, message: "Order not found" }, { status: 404 });
-// console.log(order)
+
   
     if (order.userId.toString() !== decoded.userId)
       return Response.json({ success: false, message: "Forbidden" }, { status: 403 });
 
-    // Only allow delete if cancelled or delivered
     if (!["cancelled", "delivered","pending"].includes(order.deliveryStatus))
       return Response.json({ success: false, message: "You can only delete cancelled or delivered orders." }, { status: 400 });
 
