@@ -22,16 +22,22 @@ const addressSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema(
   {
-    userId:          { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    items:           [orderItemSchema],
-    subtotal:        Number,
-    discount:        Number,
-    deliveryFee:     Number,
-    total:           Number,
-    stripeSessionId: String,
-    status:          { type: String, default: "paid" },
-    deliveryStatus:  { type: String, default: "pending" }, 
-    address:         addressSchema,
+    userId:                { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    items:                 [orderItemSchema],
+    subtotal:              Number,
+    name:                  String,
+    discount:              Number,
+    deliveryFee:           Number,
+    total:                 Number,
+    stripeSessionId:       String,
+    status:                { type: String, default: "paid" },
+    deliveryStatus:        { type: String, default: "pending" },
+    expectedDeliveryDate:  { type: Date, default: () => {
+      const date = new Date();
+      date.setDate(date.getDate() + 7); // 7 days from order date
+      return date;
+    }},
+    address:               addressSchema,
   },
   { timestamps: true }
 );
