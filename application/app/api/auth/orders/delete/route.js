@@ -21,7 +21,7 @@ export async function DELETE(req) {
     if (order.userId.toString() !== decoded.userId)
       return Response.json({ success: false, message: "Forbidden" }, { status: 403 });
 
-    if (!["cancelled", "delivered","pending"].includes(order.deliveryStatus))
+    if (!["cancelled","pending"].includes(order.deliveryStatus))
       return Response.json({ success: false, message: "You can only delete cancelled or delivered orders." }, { status: 400 });
 
     await Order.findByIdAndDelete(orderId);
