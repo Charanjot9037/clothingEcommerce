@@ -36,6 +36,7 @@ export async function POST(req) {
     await cart.save();
     return Response.json({ success: true, cart });
   } catch (error) {
+    console.error("Error adding to cart:", error);
     return Response.json({ success: false, message: "Server error" }, { status: 500 });
   }
 }

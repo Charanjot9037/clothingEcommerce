@@ -5,6 +5,7 @@ import BrandShowcase from "../elements/BrandShowcase";
 import ProductSection from "../elements/ProductSection";
 import DressStyleSection from "../elements/DressStyleSection";
 import Testimonials from "../elements/Testimonial";
+import { useEffect, useState } from "react";
 import {
  
   NEW_ARRIVALS,
@@ -16,6 +17,31 @@ import {
 import Footer from "../elements/Footer";
 
 export default function MainPage() {
+   const [products, setProducts] = useState([]);
+
+const mapProduct = (p) => ({
+  id:     p._id,
+  image:  p.images?.[0] || p.image || "/main/card-1.png",
+  title:  p.title,
+  price:  p.price,
+  rating: p.rating ?? 0,
+});
+
+useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const res  = await fetch("/api/products");
+      const data = await res.json();
+      const mapped = (data.products ?? []).map(mapProduct);
+      console.log("Mapped products:", mapped); // ← check this in console
+      setProducts(mapped);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+    }
+  };
+
+  fetchProducts();
+}, []);
   return (
     <div>
       <AnnouncementBar
@@ -34,7 +60,7 @@ export default function MainPage() {
       <BrandShowcase brands={BRANDS} />
       <ProductSection
         title="NEW ARRIVALS"
-        products={NEW_ARRIVALS}
+        products={products}
         onViewAll={() => console.log("View All Clicked")}
       />
       <ProductSection

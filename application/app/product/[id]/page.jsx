@@ -1,48 +1,77 @@
 // app/product/[id]/page.jsx
-import { notFound } from "next/navigation";
+"use client"; // ← make it a client component
+
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import { getProductById, getRelatedProducts } from "../../../lib/products";
 import ProductImages from "../../components/products/ProductImages";
 import ProductInfo from "../../components/products/ProductInfo";
 import ReviewsSection from "../../components/products/ReviewsSection";
 import RelatedProducts from "../../components/products/RelatedProducts";
+// import { toast } from "../../utils/toast"; // assuming you have a toast helper
 
-export async function generateMetadata({ params }) {
-  const { id } = await params;
-  const product = getProductById(id);
-  if (!product) return { title: "Product Not Found" };
-  return {
-    title: `${product.title} – SHOP.CO`,
-    description: product.description,
-  };
-}
+export default function ProductPage() {
+  const params = useParams();
+  const { id } = params;
 
-export default async function ProductPage({ params }) {
-  const { id } = await params;
-  const product = getProductById(id);
-  if (!product) notFound();
-  const related = getRelatedProducts(product, 4);
+  const [product, setProduct] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const loadProduct = useCallback(async () => {
+    setLoading(true);
+    try {
+      // Fetch the single product
+      const res = await fetch(`/api/products/${id}`);
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      setProduct(data.product);
+
+      // Fetch all products to determine related products
+      const resAll = await fetch(`/api/products`);
+      const allData = await resAll.json();
+      if (!allData.success) throw new Error(allData.message);
+
+      const relatedProducts = (allData.products ?? [])
+        .filter(p => p.category === data.product.category && p._id !== data.product._id)
+        .slice(0, 4);
+
+      setRelated(relatedProducts);
+    } catch (e) {
+      console.error(e);
+      toast(e.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    loadProduct();
+  }, [id, loadProduct]);
+
+  if (loading || !product) return <p className="p-8 text-center">Loading...</p>;
 
   return (
     <main>
       {/* Breadcrumb */}
       <nav className="px-4 sm:px-8 lg:px-20 py-4 text-sm text-gray-400 flex gap-2 items-center flex-wrap">
-        <Link href="/" className="hover:text-black transition-colors">Home</Link>
+        <Link href="/" className="hover:text-black">Home</Link>
         <span>›</span>
-        <Link href="/shop" className="hover:text-black transition-colors">Shop</Link>
+        <Link href="/shop" className="hover:text-black">Shop</Link>
         <span>›</span>
-        <Link href="/shop/men" className="hover:text-black transition-colors">Men's</Link>
+        <Link href={`/shop/${product.category}`} className="hover:text-black">{product.category}</Link>
         <span>›</span>
         <span className="text-black">{product.title}</span>
       </nav>
 
-      {/* Product Main Section */}
+      {/* Product Section */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 px-4 sm:px-8 lg:px-20 pb-16">
-        <ProductImages image={product.image} title={product.title} />
+        <ProductImages image={product.images} title={product.title} />
         <ProductInfo product={product} />
       </section>
 
-      {/* Reviews & Tabs */}
+      {/* Reviews */}
       <ReviewsSection />
 
       {/* Related Products */}

@@ -16,6 +16,19 @@ function verifyAdmin(req) {
     return null;
   }
 }
+export async function GET(req, context) {
+  try {
+    await connectDB();
+    const { id } = await context.params;
+    const product = await Product.findById(id).lean();
+    if (!product) return Response.json({ success: false, message: "Product not found" }, { status: 404 });
+    return Response.json({ success: true, product });
+  } catch (err) {
+    console.error("GET /api/products/:id error:", err.message);
+    return Response.json({ success: false, message: err.message }, { status: 500 });
+  }
+}
+
 
 // ✅ Fix 1: await context.params — required in Next.js 15
 export async function PATCH(req, context) {

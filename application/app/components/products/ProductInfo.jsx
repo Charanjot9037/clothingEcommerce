@@ -14,7 +14,7 @@ export default function ProductInfo({ product }) {
   const [feedback, setFeedback] = useState(""); // success / error message
 
   const router = useRouter();
-
+console.log(product)
   const dispatch = useDispatch();
   const colors = product.colors ?? ["#4a5c3d", "#2d3a2d", "#1a3458"];
   const sizes  = product.sizes  ?? ["Small", "Medium", "Large", "X-Large"];
@@ -40,18 +40,18 @@ export default function ProductInfo({ product }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId,
-          productId:     product.id,
-          title:         product.title,
-          image:         product.image,
-          price:         product.price,
-          oldPrice:      product.oldPrice   ?? null,
-          discount:      product.discount   ?? null,
-          category:      product.category   ?? null,
-          rating:        product.rating     ?? null,
-          selectedColor: colors[selectedColor],   // actual hex value e.g "#1a3458"
-          selectedSize:  sizes[selectedSize],     // actual label e.g "Medium"
-          quantity:      qty,
+       userId,
+          productId: product._id,       // use _id from backend
+          title: product.title,
+          image: product.images?.[0] || product.image || "/main/card-1.png", // first image
+          price: product.price,
+          oldPrice: product.oldPrice ?? null,
+          discount: product.discount ?? null,
+          category: product.category ?? null,
+          rating: product.rating ?? 0,
+          selectedColor: colors[selectedColor],
+          selectedSize: sizes[selectedSize],
+          quantity: qty,
         }),
       });
 
