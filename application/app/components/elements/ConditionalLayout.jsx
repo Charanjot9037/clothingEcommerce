@@ -11,13 +11,16 @@ export default function ConditionalLayout({ children }) {
   const isAdminPage = pathname?.startsWith("/admin");
   const isLogin = pathname?.startsWith("/login");
   const isSignUp = pathname?.startsWith("/signup");
+  const isResetPassword = pathname?.startsWith("/reset-password");
   return (
     <>
-      {!isAdminPage && !isLogin && !isSignUp && <Navbar logo="/global/logo.svg" links={NAV_LINKS} />}
+      {!isAdminPage && !isLogin && !isSignUp && !isResetPassword && (
+        <Navbar logo="/global/logo2.jpg" links={NAV_LINKS} />
+      )}
       {children}
-      {!isAdminPage && !isLogin && !isSignUp && <Newsletter />}
-      {!isAdminPage && !isLogin && !isSignUp && <StyleAdvisorWidget />}
-      {!isAdminPage && !isLogin && !isSignUp && <Footer />}
+      {!isAdminPage && !isLogin && !isSignUp && !isResetPassword && <Newsletter />}
+      {!isAdminPage && !isLogin && !isSignUp && !isResetPassword && <StyleAdvisorWidget />}
+      {!isAdminPage && !isLogin && !isSignUp && !isResetPassword && <Footer />}
     </>
   );
 }
