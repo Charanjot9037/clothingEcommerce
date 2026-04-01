@@ -54,19 +54,16 @@ export default function AdminDashboard() {
       <div className="flex h-screen overflow-hidden">
 
         {/* ── SIDEBAR — black, matches your site's nav/footer ── */}
-        <aside className="w-56 flex-shrink-0 bg-black text-white flex flex-col py-8 px-5 gap-0.5">
-          <div className="mb-10 px-2">
-            <div className="text-2xl font-black tracking-widest text-white">SHOP.CO</div>
-            <div className="text-[10px] text-white/40 tracking-[0.2em] mt-1 uppercase">Admin Console</div>
-          </div>
+        <aside className="w-56 flex-shrink-0  bg-gradient-to-b from-gray-950 to-slate-800 text-black border-r border-t flex flex-col py-8 px-5 gap-0.5">
+        
 
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={clsx(
-                "flex items-center gap-3 px-3 py-2.5 text-sm w-full text-left transition-all",
+                "flex items-center gap-3 px-3 py-2.5 text-base w-full text-left transition-all",
                 tab === t.key
-                  ? "bg-white text-black font-bold"
-                  : "text-white/50 hover:text-white hover:bg-white/10"
+                  ? " text-white font-bold"
+                  : "text-white hover:text-white hover:bg-white/10"
               )}>
               <span className="w-5 text-center">{t.icon}</span>
               {t.label}

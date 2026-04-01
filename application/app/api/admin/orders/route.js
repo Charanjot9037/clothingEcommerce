@@ -14,6 +14,22 @@ function verifyAdmin(req) {
   return decoded;
 }
 
+// Delivery days per status
+const DELIVERY_DAYS = {
+  processing: 7,
+  dispatched:  4,
+  shipped:     2,
+  delivered:   0,
+};
+
+function getExpectedDeliveryDate(status) {
+  if (status === "delivered") return new Date(); // already delivered
+  const days = DELIVERY_DAYS[status] ?? 7;
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return date;
+}
+
 // GET /api/admin/orders — all orders, paginated + filterable
 export async function GET(req) {
   try {
@@ -64,7 +80,7 @@ export async function GET(req) {
   }
 }
 
-// PATCH /api/admin/orders — update deliveryStatus
+// PATCH /api/admin/orders — update deliveryStatus + auto expectedDeliveryDate
 export async function PATCH(req) {
   try {
     await connectDB();
@@ -78,9 +94,11 @@ export async function PATCH(req) {
 
     const { orderId, deliveryStatus } = await req.json();
 
+    const expectedDeliveryDate = getExpectedDeliveryDate(deliveryStatus);
+
     const order = await Order.findByIdAndUpdate(
       orderId,
-      { $set: { deliveryStatus } },
+      { $set: { deliveryStatus, expectedDeliveryDate } },
       { new: true }
     ).populate("userId", "name email"); // 🔥 OPTIONAL (but useful)
 
