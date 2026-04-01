@@ -65,9 +65,9 @@ export default function Navbar({ logo, links }) {
         <button className="lg:hidden" onClick={() => setOpenMenu(true)}>
           <Menu size={26} />
         </button>
-
-        <Image src={logo} alt="Logo" width={180} height={90} className="w-[125px] lg:w-1/7" />
-
+ <p className="text-2xl font-bold">Urban.CO</p>
+    
+       
         <div className="hidden lg:flex">
           <NavLinks links={links} />
         </div>

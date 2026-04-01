@@ -1,6 +1,7 @@
 import Button from "./Button";
 import StatsItem from "../atoms/StatsItem";
 import Wrapper from "../atoms/Wrapper";
+import Link from "next/link";
 
 export default function HeroSection({
   title,
@@ -24,7 +25,7 @@ export default function HeroSection({
             </p>
 
             <div className="mt-6 ">
-              <Button variant="dark" >Shop Now</Button>
+              <Button variant="dark" ><Link href="shop/new-arrivals">Shop Now</Link></Button>
             </div>
 
             <div className="flex gap-8  mt-10">
