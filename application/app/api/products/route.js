@@ -56,18 +56,24 @@ export async function POST(req) {
     }
 
     const product = await Product.create({
-      title:        body.title.trim(),
-      price:        Number(body.price),
-      oldPrice:     body.oldPrice     ? Number(body.oldPrice)  : null,
-      discount:     body.discount     ? Number(body.discount)  : 0,
-      category:     body.category,
-      image:        body.image        ?? "",
-      rating:       body.rating       ?? 0,
-      description:  body.description  ?? "",
-      sizes:        body.sizes        ?? [],
-      colors:       body.colors       ?? [],
-      featured:     body.featured     ?? false,
-      stock:        Number(body.stock) || 0,
+      title:       body.title.trim(),
+      price:       Number(body.price),
+      oldPrice:    body.oldPrice  ? Number(body.oldPrice) : null,
+      discount:    body.discount  ? Number(body.discount) : 0,
+      category:    body.category,
+     
+      images:      Array.isArray(body.images)                    // ← NEW
+                     ? body.images.filter(Boolean)
+                     : [],
+      rating:      body.rating       ?? 0,
+      description: body.description  ?? "",
+      sizes:       body.sizes        ?? [],
+      colors:      body.colors       ?? [],
+      featured:    body.featured     ?? false,
+      stock:       Number(body.stock) || 0,
+      reviews:     Array.isArray(body.reviews)                   // ← NEW
+                     ? body.reviews.filter(r => r?.user && r?.rating)
+                     : [],
     });
 
     return Response.json({ success: true, product }, { status: 201 });

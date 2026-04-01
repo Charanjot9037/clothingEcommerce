@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import clsx from "clsx";
-
+import CloudinaryImageUpload from "./CloudinaryUpload";
 const getToken = () =>
   typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -297,6 +297,7 @@ function ProductsTab({ toast }) {
     return <ProductForm initial={editing} onSubmit={p => handleSave(p, editing?._id)} onCancel={() => { setView("list"); setEditing(null); }} />;
   }
 
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -321,8 +322,8 @@ function ProductsTab({ toast }) {
                 <tr key={i} className="border-t border-black/6 hover:bg-black/2 transition-all">
                   <td className="px-5 py-3">
                     <div className="flex items-center gap-3">
-                      {p.image ? <img src={p.image} alt="" className="w-10 h-10 object-cover" />
-                        : <div className="w-10 h-10 bg-black/5 flex items-center justify-center">🛍️</div>}
+                      {p.images?.[0] ? <img src={p.images[0]} alt="hi" className="w-10 h-10 object-cover" />
+                        : <div className="w-10 h-10 bg-black/5 flex items-center justify-center">not found</div>}
                       <span className="font-semibold">{p.title}</span>
                     </div>
                   </td>
@@ -354,8 +355,23 @@ function ProductsTab({ toast }) {
 }
 
 function ProductForm({ initial, onSubmit, onCancel }) {
-  const blank = { title:"", price:"", oldPrice:"", discount:"", category:"", image:"", rating:"", description:"", sizes:"", colors:"", stock:"", featured:false };
-  const [form, setForm] = useState(initial ? { ...blank, ...initial, sizes:(initial.sizes??[]).join(", "), colors:(initial.colors??[]).join(", ") } : blank);
+ const blank = {
+  title: "", price: "", oldPrice: "", discount: "", category: "",
+  images: ["", "", ""],   
+  rating: "", description: "", sizes: "", colors: "", stock: "", featured: false,
+  reviews: [{}, {}, {}],
+};
+ const [form, setForm] = useState(
+  initial
+    ? {
+        ...blank,
+        ...initial,
+        sizes:  (initial.sizes  ?? []).join(", "),
+        colors: (initial.colors ?? []).join(", "),
+        images: initial.images?.length ? initial.images : ["", "", ""],  // ← ADD THIS
+      }
+    : blank
+);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
 
@@ -368,13 +384,23 @@ function ProductForm({ initial, onSubmit, onCancel }) {
     return e;
   };
   const submit = async (ev) => {
-    ev.preventDefault();
-    const e = validate();
-    if (Object.keys(e).length) { setErrors(e); return; }
-    setSaving(true);
-    await onSubmit({ ...form, price:+form.price, oldPrice:form.oldPrice?+form.oldPrice:null, discount:form.discount?+form.discount:0, rating:form.rating?+form.rating:0, stock:form.stock?+form.stock:0, sizes:form.sizes.split(",").map(s=>s.trim()).filter(Boolean), colors:form.colors.split(",").map(s=>s.trim()).filter(Boolean) });
-    setSaving(false);
-  };
+  ev.preventDefault();
+  const e = validate();
+  if (Object.keys(e).length) { setErrors(e); return; }
+  setSaving(true);
+  await onSubmit({
+    ...form,
+    price:    +form.price,
+    oldPrice: form.oldPrice  ? +form.oldPrice  : null,
+    discount: form.discount  ? +form.discount  : 0,
+    rating:   form.rating    ? +form.rating    : 0,
+    stock:    form.stock     ? +form.stock     : 0,
+    sizes:    form.sizes.split(",").map(s => s.trim()).filter(Boolean),
+    colors:   form.colors.split(",").map(s => s.trim()).filter(Boolean),
+    images:   (form.images ?? []).filter(Boolean),   // ← ADD THIS
+  });
+  setSaving(false);
+};
 
   return (
     <div>
@@ -382,27 +408,174 @@ function ProductForm({ initial, onSubmit, onCancel }) {
         <button onClick={onCancel} className="text-black/40 hover:text-black text-xl">←</button>
         <PageHeader title={initial ? "Edit Product" : "Add New Product"} sub="Saved directly to MongoDB" compact />
       </div>
-      <form onSubmit={submit} className="bg-white border border-black/10 p-8 max-w-3xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
-          <Field label="Title *" error={errors.title} span2><input value={form.title} onChange={e=>set("title",e.target.value)} placeholder="Classic White T-Shirt" className={inp(errors.title)} /></Field>
-          <Field label="Price ($) *" error={errors.price}><input type="number" min="0" step="0.01" value={form.price} onChange={e=>set("price",e.target.value)} placeholder="29.99" className={inp(errors.price)} /></Field>
-          <Field label="Old Price ($)"><input type="number" min="0" step="0.01" value={form.oldPrice} onChange={e=>set("oldPrice",e.target.value)} placeholder="39.99" className={inp()} /></Field>
-          <Field label="Discount (%)"><input type="number" min="0" max="100" value={form.discount} onChange={e=>set("discount",e.target.value)} placeholder="20" className={inp()} /></Field>
-          <Field label="Category *" error={errors.category}><input value={form.category} onChange={e=>set("category",e.target.value)} placeholder="men / women / kids" className={inp(errors.category)} /></Field>
-          <Field label="Stock"><input type="number" min="0" value={form.stock} onChange={e=>set("stock",e.target.value)} placeholder="100" className={inp()} /></Field>
-          <Field label="Rating (0–5)"><input type="number" min="0" max="5" step="0.1" value={form.rating} onChange={e=>set("rating",e.target.value)} placeholder="4.5" className={inp()} /></Field>
-          <Field label="Image URL" span2><input value={form.image} onChange={e=>set("image",e.target.value)} placeholder="https://…" className={inp()} /></Field>
-          <Field label="Sizes (comma-separated)"><input value={form.sizes} onChange={e=>set("sizes",e.target.value)} placeholder="XS, S, M, L, XL" className={inp()} /></Field>
-          <Field label="Colors (comma-separated)"><input value={form.colors} onChange={e=>set("colors",e.target.value)} placeholder="Black, White, Navy" className={inp()} /></Field>
-          <Field label="Description" span2><textarea rows={3} value={form.description} onChange={e=>set("description",e.target.value)} placeholder="Short product description…" className={inp()+" resize-none"} /></Field>
-          <div className="md:col-span-2"><Toggle label="Feature on homepage" value={form.featured} onChange={v=>set("featured",v)} /></div>
-          {form.image && <div className="md:col-span-2 border border-black/10 overflow-hidden"><img src={form.image} alt="preview" className="w-full h-48 object-cover" /><div className="px-3 py-1.5 bg-black/3 text-xs text-black/35">Image preview</div></div>}
-          <div className="md:col-span-2 flex gap-3 pt-4 border-t border-black/10">
-            <button type="submit" disabled={saving} className="bg-black text-white font-bold px-8 py-3 text-sm hover:bg-black/80 disabled:opacity-50 transition-all uppercase tracking-wide">{saving ? "Saving…" : initial ? "Save Changes" : "Add to Shop"}</button>
-            <button type="button" onClick={onCancel} className="border border-black/20 text-black/60 px-6 py-3 text-sm font-medium hover:border-black hover:text-black transition-all">Cancel</button>
-          </div>
-        </div>
-      </form>
+
+
+<form onSubmit={submit} className="bg-white border border-black/10 p-8 max-w-3xl">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+
+    {/* ── Title ── */}
+    <Field label="Title *" error={errors.title} span2>
+      <input
+        value={form.title}
+        onChange={e => set("title", e.target.value)}
+        placeholder="Classic White T-Shirt"
+        className={inp(errors.title)}
+      />
+    </Field>
+
+    {/* ── Price / Old Price ── */}
+    <Field label="Price ($) *" error={errors.price}>
+      <input
+        type="number" min="0" step="0.01"
+        value={form.price}
+        onChange={e => set("price", e.target.value)}
+        placeholder="29.99"
+        className={inp(errors.price)}
+      />
+    </Field>
+    <Field label="Old Price ($)">
+      <input
+        type="number" min="0" step="0.01"
+        value={form.oldPrice}
+        onChange={e => set("oldPrice", e.target.value)}
+        placeholder="39.99"
+        className={inp()}
+      />
+    </Field>
+
+    {/* ── Discount / Category ── */}
+    <Field label="Discount (%)">
+      <input
+        type="number" min="0" max="100"
+        value={form.discount}
+        onChange={e => set("discount", e.target.value)}
+        placeholder="20"
+        className={inp()}
+      />
+    </Field>
+    <Field label="Category *" error={errors.category}>
+      <input
+        value={form.category}
+        onChange={e => set("category", e.target.value)}
+        placeholder="men / women / kids"
+        className={inp(errors.category)}
+      />
+    </Field>
+
+    {/* ── Stock / Rating ── */}
+    <Field label="Stock">
+      <input
+        type="number" min="0"
+        value={form.stock}
+        onChange={e => set("stock", e.target.value)}
+        placeholder="100"
+        className={inp()}
+      />
+    </Field>
+    <Field label="Rating (0–5)">
+      <input
+        type="number" min="0" max="5" step="0.1"
+        value={form.rating}
+        onChange={e => set("rating", e.target.value)}
+        placeholder="4.5"
+        className={inp()}
+      />
+    </Field>
+
+
+
+    {/* ── Gallery Images (3 Cloudinary URLs) ── */}
+   {[0, 1, 2].map(i => (
+  <CloudinaryImageUpload
+    key={i}
+    index={i}
+    label={`Gallery Image ${i + 1}`}
+    value={form.images?.[i] ?? ""}
+    onChange={url => {
+      const imgs = [...(form.images ?? ["", "", ""])];
+      imgs[i] = url;
+      set("images", imgs);
+    }}
+  />
+))}
+    {/* ── Gallery preview strip ── */}
+    {(form.images ?? []).some(Boolean) && (
+      <div className="md:col-span-2 flex gap-2">
+        {(form.images ?? []).map((url, i) =>
+          url ? (
+            <div key={i} className="flex-1 border border-black/10 overflow-hidden">
+              <img src={url} alt={`gallery-${i + 1}`} className="w-full h-28 object-cover" />
+              <div className="px-2 py-1 bg-black/3 text-xs text-black/35">Image {i + 1}</div>
+            </div>
+          ) : null
+        )}
+      </div>
+    )}
+
+    {/* ── Sizes / Colors ── */}
+    <Field label="Sizes (comma-separated)">
+      <input
+        value={form.sizes}
+        onChange={e => set("sizes", e.target.value)}
+        placeholder="XS, S, M, L, XL"
+        className={inp()}
+      />
+    </Field>
+    <Field label="Colors (comma-separated)">
+      <input
+        value={form.colors}
+        onChange={e => set("colors", e.target.value)}
+        placeholder="#000000, #ffffff, #1a3458"
+        className={inp()}
+      />
+    </Field>
+
+    {/* ── Description ── */}
+    <Field label="Description" span2>
+      <textarea
+        rows={3}
+        value={form.description}
+        onChange={e => set("description", e.target.value)}
+        placeholder="Short product description…"
+        className={inp() + " resize-none"}
+      />
+    </Field>
+
+
+
+    {/* ── Featured toggle ── */}
+    <div className="md:col-span-2">
+      <Toggle label="Feature on homepage" value={form.featured} onChange={v => set("featured", v)} />
+    </div>
+
+    {/* ── Main image preview ── */}
+    {form.image && (
+      <div className="md:col-span-2 border border-black/10 overflow-hidden">
+        <img src={form.image} alt="preview" className="w-full h-48 object-cover" />
+        <div className="px-3 py-1.5 bg-black/3 text-xs text-black/35">Main image preview</div>
+      </div>
+    )}
+
+    {/* ── Actions ── */}
+    <div className="md:col-span-2 flex gap-3 pt-4 border-t border-black/10">
+      <button
+        type="submit"
+        disabled={saving}
+        className="bg-black text-white font-bold px-8 py-3 text-sm hover:bg-black/80 disabled:opacity-50 transition-all uppercase tracking-wide"
+      >
+        {saving ? "Saving…" : initial ? "Save Changes" : "Add to Shop"}
+      </button>
+      <button
+        type="button"
+        onClick={onCancel}
+        className="border border-black/20 text-black/60 px-6 py-3 text-sm font-medium hover:border-black hover:text-black transition-all"
+      >
+        Cancel
+      </button>
+    </div>
+
+  </div>
+</form>
     </div>
   );
 }

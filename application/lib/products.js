@@ -1,6 +1,6 @@
 export const NEW_ARRIVALS = [
   {
-    id: "p1",
+    id: "69cd618202f7ba3e087548a1",
     image: "/main/card-1.png",
     title: "T-shirt with Tape Details",
     price: 120,
