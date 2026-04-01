@@ -131,8 +131,18 @@ export default function Navbar({ logo, links }) {
         </div>
         {userName && (
           <div className="px-5 pt-4 border-t">
-            <p className="text-sm font-medium">{userName}</p>
-            <button onClick={handleLogout} className="text-sm text-red-500 mt-1">Logout</button>
+           
+            <div className="flex flex-col gap-2 items-start ">
+               <p className="text-sm font-medium">Hi.{userName}</p>
+  <button onClick={handleLogout} className="text-sm text-red-500 mt-1">Logout</button>
+              <button
+                  onClick={() => router.push("/orders")}
+                  className="text-sm mt-1"
+                >
+                  Orders
+                </button>
+            </div>
+          
           </div>
         )}
       </div>
