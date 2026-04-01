@@ -124,7 +124,7 @@ function OverviewTab({ onNav, toast }) {
 
   if (loading) return <Skeleton rows={6} />;
   const s = analytics?.stats ?? {};
-
+console.log(orders)
   const cards = [
     { label: "Revenue (30d)",   value: fmt(s.revenue),       pct: s.revenuePct, nav: "analytics" },
     { label: "Orders (30d)",    value: s.orders ?? 0,        pct: s.ordersPct,  nav: "orders"    },
@@ -156,7 +156,7 @@ function OverviewTab({ onNav, toast }) {
             {orders.map((o, i) => (
               <tr key={i} className="border-t border-black/6 hover:bg-black/2 transition-all">
                 <td className="px-5 py-3 font-mono text-xs font-bold text-black/40">#{String(o._id).slice(-6).toUpperCase()}</td>
-                <td className="px-5 py-3 text-black/50 text-xs">{o.userId}</td>
+                <td className="px-5 py-3 text-black/50 text-xs">{o.user?.name || "Unknown User"}</td>
                 <td className="px-5 py-3 font-black">{fmt(o.total)}</td>
                 <td className="px-5 py-3">
                   <span className={clsx("px-2.5 py-0.5 text-xs font-semibold capitalize rounded-full", STATUS_PILL[o.deliveryStatus])}>
@@ -231,7 +231,7 @@ function OrdersTab({ toast }) {
               {orders.map((o, i) => (
                 <tr key={i} className="border-t border-black/6 hover:bg-black/2 transition-all">
                   <td className="px-5 py-3 font-mono text-xs font-bold text-black/40">#{String(o._id).slice(-6).toUpperCase()}</td>
-                  <td className="px-5 py-3 text-xs text-black/50 truncate max-w-[100px]">{o.userId}</td>
+                  <td className="px-5 py-3 text-xs text-black/50 truncate max-w-[100px]">{o?.userId?.name}</td>
                   <td className="px-5 py-3 text-black/60">{o.items?.length ?? 0}</td>
                   <td className="px-5 py-3">{fmt(o.subtotal)}</td>
                   <td className="px-5 py-3">{fmt(o.deliveryFee)}</td>
