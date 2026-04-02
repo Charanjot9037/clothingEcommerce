@@ -30,6 +30,7 @@ export default function MainPage() {
           fetch("/api/products?category=new-arrivals&limit=4"),
           fetch("/api/products?category=top-selling&limit=4"),
         ]);
+        
         const newData = await newRes.json();
         const topData = await topRes.json();
 
