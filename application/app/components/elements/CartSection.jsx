@@ -175,6 +175,7 @@ const [address, setAddress] = useState({
         headers: authHeaders(token, true),
         body: JSON.stringify({
           items,
+          address,
           subtotal,
           discount,
           deliveryFee: DELIVERY_FEE,
