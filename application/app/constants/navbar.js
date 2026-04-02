@@ -15,8 +15,5 @@ export  const NAV_LINKS = [
     label: "New Arrivals",
     href: "/shop/new-arrivals",
   },
-  {
-    label: "Brands",
-    href: "/brands",
-  },
+ 
 ];
