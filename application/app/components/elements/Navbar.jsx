@@ -60,12 +60,17 @@ export default function Navbar({ logo, links }) {
 
   return (
     <Wrapper>
-      <div className="flex items-center justify-between py-6">
+      <div className="flex items-center justify-between py-4">
 
         <button className="lg:hidden" onClick={() => setOpenMenu(true)}>
           <Menu size={26} />
         </button>
- <p className="text-2xl font-bold">Urban.CO</p>
+ <div className="flex items-center gap-2 relative z-10 ">
+          <div className="w-9 h-9 rounded-xl bg-black  flex items-center justify-center">
+            <span className="text-base   font-extrabold text-white">U</span>
+          </div>
+          <span className="text-black font-bold text-lg tracking-tight">Urban.CO</span>
+        </div>
     
        
         <div className="hidden lg:flex">
@@ -123,7 +128,12 @@ export default function Navbar({ logo, links }) {
       {/* Mobile Drawer */}
       <div className={`fixed top-0 left-0 h-full w-[260px] bg-white shadow-lg z-50 transform transition-transform duration-300 ${openMenu ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex justify-between items-center p-5 border-b">
-          <Image src={logo} alt="logo" width={100} height={50} />
+          <div className="flex items-center gap-2 relative z-10 ">
+          <div className="w-9 h-9 rounded-xl bg-black  flex items-center justify-center">
+            <span className="text-base   font-extrabold text-white">U</span>
+          </div>
+          <span className="text-black font-bold text-lg tracking-tight">Urban.CO</span>
+        </div>
           <button onClick={() => setOpenMenu(false)}><X size={24} /></button>
         </div>
         <div className="p-5">

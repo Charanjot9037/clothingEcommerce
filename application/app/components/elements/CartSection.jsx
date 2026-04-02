@@ -14,7 +14,23 @@ const PROMO_CODES = { SAVE10: 10, SAVE20: 20 };
 
 export default function CartSection() {
   const dispatch = useDispatch();
+const validateAddress = () => {
+  const { fullName, street, city, state, zip, country, phone } = address;
 
+  if (!fullName.trim()) return "Full Name is required";
+  if (!street.trim()) return "Street Address is required";
+  if (!city.trim()) return "City is required";
+  if (!state.trim()) return "State is required";
+  if (!zip.trim()) return "ZIP code is required";
+  if (!country) return "Please select a country";
+  if (!phone.trim()) return "Phone number is required";
+
+  // optional stronger validations
+  if (!/^[0-9]{10}$/.test(phone)) return "Phone must be 10 digits";
+  if (!/^[0-9]{4,10}$/.test(zip)) return "Invalid ZIP code";
+
+  return null;
+};
   const [cart, setCart]                   = useState(null);
   const [loading, setLoading]             = useState(true);
   const [promoCode, setPromoCode]         = useState("");
@@ -136,6 +152,11 @@ const [address, setAddress] = useState({
   // ─── STRIPE CHECKOUT ───────────────────────────────────────────────────────
   const handleCheckout = async () => {
     const token = getToken(); if (!token) return;
+     const error = validateAddress();
+  if (error) {
+    alert(error);
+    return;
+  }
     setCheckoutLoading(true);
     try {
       // 1. Create Stripe checkout session
@@ -310,6 +331,7 @@ const [address, setAddress] = useState({
     <input
       type="text"
       placeholder="Full Name"
+      required
       value={address.fullName}
       onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
       className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
@@ -323,6 +345,7 @@ const [address, setAddress] = useState({
       type="text"
       placeholder="Street Address"
       value={address.street}
+      required
       onChange={(e) => setAddress({ ...address, street: e.target.value })}
       className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
     />
@@ -335,6 +358,7 @@ const [address, setAddress] = useState({
         type="text"
         placeholder="City"
         value={address.city}
+        required
         onChange={(e) => setAddress({ ...address, city: e.target.value })}
         className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
       />
@@ -344,6 +368,7 @@ const [address, setAddress] = useState({
         type="text"
         placeholder="State"
         value={address.state}
+        required
         onChange={(e) => setAddress({ ...address, state: e.target.value })}
         className="text-sm outline-none bg-transparent placeholder-gray-400 w-full"
       />

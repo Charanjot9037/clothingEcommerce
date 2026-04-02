@@ -6,7 +6,7 @@ import StarRating from "../../components/products/StarRating";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { setCart as setReduxCart } from "../../store/slices/cartSlice";
-export default function ProductInfo({ product }) {
+export default function ProductInfo({ product,activeImage, setActiveImage }) {
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedSize, setSelectedSize] = useState(2);
   const [qty, setQty] = useState(1);
@@ -14,7 +14,7 @@ export default function ProductInfo({ product }) {
   const [feedback, setFeedback] = useState(""); // success / error message
 
   const router = useRouter();
-console.log(product)
+
   const dispatch = useDispatch();
   const colors = product.colors ?? ["#4a5c3d", "#2d3a2d", "#1a3458"];
   const sizes  = product.sizes  ?? ["Small", "Medium", "Large", "X-Large"];
@@ -43,7 +43,10 @@ console.log(product)
        userId,
           productId: product._id,       // use _id from backend
           title: product.title,
-          image: product.images?.[0] || product.image || "/main/card-1.png", // first image
+          image:
+  product.images?.[activeImage] ||
+  product.images?.[0] ||
+  product.image,
           price: product.price,
           oldPrice: product.oldPrice ?? null,
           discount: product.discount ?? null,
@@ -112,7 +115,10 @@ console.log(product)
           {colors.map((color, i) => (
             <button
               key={i}
-              onClick={() => setSelectedColor(i)}
+               onClick={() => {
+      setSelectedColor(i);
+      setActiveImage(i); // 🔥 sync image with color
+    }}
               title={color}
               style={{ backgroundColor: color }}
               className={`w-8 h-8 rounded-full transition-all ${

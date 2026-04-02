@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+
 import Image from "next/image";
 
-export default function ProductImages({ image, title }) {
+export default function ProductImages({ image, title, active, setActive }) {
   // ✅ ensure it's always an array
   const images = Array.isArray(image) ? image : [image];
 
-  const [active, setActive] = useState(0);
+
 
   return (
     <div className="flex flex-col-reverse gap-4 sm:flex-row">
