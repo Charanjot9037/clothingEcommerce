@@ -29,8 +29,7 @@ export default function MainPage() {
         const [newRes, topRes] = await Promise.all([
           fetch("/api/products?category=new-arrivals&limit=4"),
           fetch("/api/products?category=top-selling&limit=4"),
-        ]);
-        
+        ])
         const newData = await newRes.json();
         const topData = await topRes.json();
 
