@@ -1,7 +1,7 @@
 // app/shop/page.jsx
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo ,useEffect} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import StarRating from "../../components/products/StarRating";
@@ -168,50 +168,52 @@ function FilterContent({ filters, setFilters, onApply }) {
 
 // ── Product Card ────────────────────────────────────────────
 function ProductCard({ product }) {
+  const { _id, title, price, oldPrice, discount, images, rating } = product;
+
   return (
-    <Link href={`/product/${product.id}`} className="group flex flex-col gap-3">
+    <Link href={`/product/${_id}`} className="group flex flex-col gap-3">
       <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-100">
         <Image
-          src={product.image}
-          alt={product.title}
+          src={images?.[0] || "/placeholder.png"} // fallback if image is empty
+          alt={title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        {product.discount && (
+        {discount && (
           <span className="absolute top-3 right-3 bg-red-50 text-red-500 text-xs font-semibold px-2.5 py-1 rounded-full">
-            {product.discount}
+            {discount}%
           </span>
         )}
       </div>
       <p className="font-semibold text-sm leading-snug group-hover:underline line-clamp-2">
-        {product.title}
+        {title}
       </p>
-      <StarRating rating={product.rating} size={14} />
+      <StarRating rating={rating} size={14} />
       <div className="flex items-center gap-2">
-        <span className="font-bold">${product.price}</span>
-        {product.oldPrice && (
-          <span className="text-sm text-gray-400 line-through">${product.oldPrice}</span>
+        <span className="font-bold">${price.toFixed(2)}</span>
+        {oldPrice && (
+          <span className="text-sm text-gray-400 line-through">
+            ${oldPrice.toFixed(2)}
+          </span>
         )}
       </div>
     </Link>
   );
 }
-
 // ── Main Page ───────────────────────────────────────────────
 export default function ShopPage() {
-  const [filters, setFilters] = useState({
-    maxPrice: 500,
-    colors: [],
-    sizes: [],
-    styles: [],
-  });
+  const [filters, setFilters] = useState({ maxPrice: 500, colors: [], sizes: [], styles: [] });
   const [appliedFilters, setAppliedFilters] = useState(filters);
   const [sort, setSort] = useState("Most Popular");
   const [page, setPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
 
-  const { category } = useParams();
+
+
+const [products, setProducts] = useState([]);
+const [total, setTotal] = useState(0);
+const { category } = useParams();
   // ...
 
   const applyFilters = () => {
@@ -219,33 +221,38 @@ export default function ShopPage() {
     setPage(1);
     setMobileFiltersOpen(false);
   };
-
-  // Filter + sort
-  const filtered = useMemo(() => {
-    let result = ALL_PRODUCTS.filter((p) => {
-  if (category && p.category !== category) return false;  // ← add this line
-  if (p.price > appliedFilters.maxPrice) return false;
-  if (appliedFilters.colors.length > 0 && !p.colors?.some((c) => appliedFilters.colors.includes(c))) return false;
-  if (appliedFilters.sizes.length > 0 && !p.sizes?.some((s) => appliedFilters.sizes.includes(s))) return false;
-  return true;
-});
-
-    switch (sort) {
-      case "Price: Low to High":
-        result = [...result].sort((a, b) => a.price - b.price);
-        break;
-      case "Price: High to Low":
-        result = [...result].sort((a, b) => b.price - a.price);
-        break;
-      case "Newest":
-        result = [...result].reverse();
-        break;
-      default:
-        result = [...result].sort((a, b) => b.rating - a.rating);
+useEffect(() => {
+  const fetchProducts = async () => {
+    const params = new URLSearchParams({
+      category: category || "",
+      page: page.toString(),
+      limit: "50",
+    });
+    const res = await fetch(`/api/products?${params.toString()}`);
+    const data = await res.json();
+    if (data.success) {
+      setProducts(data.products);
+      setTotal(data.total);
     }
-
-    return result;
-  }, [appliedFilters, sort]);
+  };
+  fetchProducts();
+}, [category, page]);
+  // Filter + sort
+const filtered = useMemo(() => {
+  return products.filter(p => {
+    if (p.price > appliedFilters.maxPrice) return false;
+    if (appliedFilters.colors.length > 0 && !p.colors?.some(c => appliedFilters.colors.includes(c))) return false;
+    if (appliedFilters.sizes.length > 0 && !p.sizes?.some(s => appliedFilters.sizes.includes(s))) return false;
+    return true;
+  }).sort((a, b) => {
+    switch(sort) {
+      case "Price: Low to High": return a.price - b.price;
+      case "Price: High to Low": return b.price - a.price;
+      case "Newest": return new Date(b.createdAt) - new Date(a.createdAt);
+      default: return b.rating - a.rating;
+    }
+  });
+}, [products, appliedFilters, sort]);
 
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE);
   const paginated = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
@@ -337,7 +344,7 @@ export default function ShopPage() {
           {paginated.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {paginated.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product?._id} product={product} />
               ))}
             </div>
           ) : (

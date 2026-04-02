@@ -13,7 +13,7 @@ import RelatedProducts from "../../components/products/RelatedProducts";
 export default function ProductPage() {
   const params = useParams();
   const { id } = params;
-
+const [activeImage, setActiveImage] = useState(0);
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -50,7 +50,39 @@ export default function ProductPage() {
     loadProduct();
   }, [id, loadProduct]);
 
-  if (loading || !product) return <p className="p-8 text-center">Loading...</p>;
+if (loading || !product) {
+  return (
+    <main className="px-4 sm:px-8 lg:px-20 py-10 animate-pulse">
+      
+      {/* Breadcrumb Skeleton */}
+      <div className="h-4 w-1/3 bg-gray-200 rounded mb-6"></div>
+
+      {/* Product Section Skeleton */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+        
+        {/* Image Skeleton */}
+        <div className="bg-gray-200 rounded-2xl min-h-[300px] sm:min-h-[380px] lg:min-h-[420px]" />
+
+        {/* Info Skeleton */}
+        <div className="flex flex-col gap-5">
+          <div className="h-8 bg-gray-200 w-3/4 rounded"></div>
+          <div className="h-4 bg-gray-200 w-1/4 rounded"></div>
+          <div className="h-6 bg-gray-200 w-1/3 rounded"></div>
+
+          <div className="space-y-2">
+            <div className="h-3 bg-gray-200 w-full rounded"></div>
+            <div className="h-3 bg-gray-200 w-5/6 rounded"></div>
+            <div className="h-3 bg-gray-200 w-4/6 rounded"></div>
+          </div>
+
+          <div className="h-10 bg-gray-200 w-1/2 rounded"></div>
+          <div className="h-10 bg-gray-200 w-full rounded-full"></div>
+        </div>
+
+      </section>
+    </main>
+  );
+}
 
   return (
     <main>
@@ -67,8 +99,9 @@ export default function ProductPage() {
 
       {/* Product Section */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 px-4 sm:px-8 lg:px-20 pb-16">
-        <ProductImages image={product.images} title={product.title} />
-        <ProductInfo product={product} />
+        <ProductImages image={product.images} title={product.title}  active={activeImage}
+  setActive={setActiveImage} />
+        <ProductInfo product={product} activeImage={activeImage} setActiveImage={setActiveImage} />
       </section>
 
       {/* Reviews */}

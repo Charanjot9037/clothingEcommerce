@@ -19,6 +19,7 @@ import Footer from "../elements/Footer";
 export default function MainPage() {
    const [products, setProducts] = useState([]);
 
+const [loading, setLoading] = useState(true);
 const mapProduct = (p) => ({
   id:     p._id,
   image:  p.images?.[0] || p.image || "/main/card-1.png",
@@ -30,13 +31,15 @@ const mapProduct = (p) => ({
 useEffect(() => {
   const fetchProducts = async () => {
     try {
+      setLoading(true);
       const res  = await fetch("/api/products");
       const data = await res.json();
       const mapped = (data.products ?? []).map(mapProduct);
-      console.log("Mapped products:", mapped); // ← check this in console
       setProducts(mapped);
     } catch (err) {
       console.error("Failed to fetch products:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,6 +63,7 @@ useEffect(() => {
       <BrandShowcase brands={BRANDS} />
       <ProductSection
         title="NEW ARRIVALS"
+        loading={loading}
         products={products}
         onViewAll={() => console.log("View All Clicked")}
       />
