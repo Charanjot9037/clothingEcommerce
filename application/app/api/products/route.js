@@ -7,7 +7,7 @@ import jwt from "jsonwebtoken";
 export async function GET(req) {
   try {
     await connectDB();
-
+const REAL_CATEGORIES = ["men", "women", "kids"];
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");
     const featured = searchParams.get("featured");
@@ -16,7 +16,9 @@ export async function GET(req) {
     const limit    = Math.min(50, parseInt(searchParams.get("limit") || "12"));
 
     const filter = {};
-    if (category)            filter.category = category;
+    if (category && REAL_CATEGORIES.includes(category)) {
+  filter.category = category;
+}
     if (featured === "true") filter.featured = true;
     if (search)              filter.title    = { $regex: search, $options: "i" };
 

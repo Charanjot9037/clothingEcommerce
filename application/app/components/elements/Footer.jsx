@@ -11,12 +11,12 @@ export default function Footer() {
           {/* Main Footer */}
           <div className="py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8  sm:text-left">
             <div className="flex flex-col items-start">
-              <Image
-                src="/global/logo.svg"
-                alt="logo"
-                width={160}
-                height={60}
-              />
+              <div className="flex items-center gap-2 relative z-10 ">
+          <div className="w-9 h-9 rounded-xl bg-black  flex items-center justify-center">
+            <span className="text-base   font-extrabold text-white">U</span>
+          </div>
+          <span className="text-black font-bold text-lg tracking-tight">Urban.CO</span>
+        </div>
 
               <p className="text-sm pt-4 mb-4 max-w-xs">
                 We have clothes that suits your style and which you are proud to

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import clsx from "clsx";
 import CloudinaryImageUpload from "./CloudinaryUpload";
+import Image from "next/image";
 const getToken = () =>
   typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
@@ -156,7 +157,7 @@ console.log(orders)
             {orders.map((o, i) => (
               <tr key={i} className="border-t border-black/6 hover:bg-black/2 transition-all">
                 <td className="px-5 py-3 font-mono text-xs font-bold text-black/40">#{String(o._id).slice(-6).toUpperCase()}</td>
-                <td className="px-5 py-3 text-black/50 text-xs">{o.user?.name || "Unknown User"}</td>
+                <td className="px-5 py-3 text-black/50 text-xs">{o.userId?.name || "Unknown User"}</td>
                 <td className="px-5 py-3 font-black">{fmt(o.total)}</td>
                 <td className="px-5 py-3">
                   <span className={clsx("px-2.5 py-0.5 text-xs font-semibold capitalize rounded-full", STATUS_PILL[o.deliveryStatus])}>
@@ -176,79 +177,253 @@ console.log(orders)
 
 /* ── ORDERS ───────────────────────────────────────────────────── */
 function OrdersTab({ toast }) {
-  const [orders,  setOrders]  = useState([]);
-  const [total,   setTotal]   = useState(0);
-  const [page,    setPage]    = useState(1);
-  const [status,  setStatus]  = useState("all");
+  const [orders, setOrders] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState("all");
   const [loading, setLoading] = useState(true);
+  const [selectedOrder, setSelectedOrder] = useState(null); // ✅ modal state
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const qs  = new URLSearchParams({ page, limit: 20, status }).toString();
-      const res = await fetch(`/api/admin/orders?${qs}`, { headers: authHeaders() });
+      const qs = new URLSearchParams({ page, limit: 20, status }).toString();
+      const res = await fetch(`/api/admin/orders?${qs}`, {
+        headers: authHeaders(),
+      });
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
-      setOrders(data.orders); setTotal(data.total);
-    } catch (e) { toast(e.message, "error"); }
-    finally { setLoading(false); }
+      setOrders(data.orders);
+      setTotal(data.total);
+    } catch (e) {
+      toast(e.message, "error");
+    } finally {
+      setLoading(false);
+    }
   }, [page, status]);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const updateStatus = async (orderId, deliveryStatus) => {
-    setOrders(o => o.map(x => x._id === orderId ? { ...x, deliveryStatus } : x));
+    setOrders((o) =>
+      o.map((x) => (x._id === orderId ? { ...x, deliveryStatus } : x))
+    );
     try {
-      const res = await fetch("/api/admin/orders", { method: "PATCH", headers: authHeaders(), body: JSON.stringify({ orderId, deliveryStatus }) });
+      const res = await fetch("/api/admin/orders", {
+        method: "PATCH",
+        headers: authHeaders(),
+        body: JSON.stringify({ orderId, deliveryStatus }),
+      });
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
       toast("Order updated");
-    } catch (e) { toast(e.message, "error"); load(); }
+    } catch (e) {
+      toast(e.message, "error");
+      load();
+    }
   };
 
   return (
     <div>
       <PageHeader title="Orders" sub={`${total} total orders`} />
+
+      {/* FILTER */}
       <div className="flex gap-2 mb-6 flex-wrap">
-        {["all", ...DELIVERY_STATUSES].map(s => (
-          <button key={s} onClick={() => { setStatus(s); setPage(1); }}
-            className={clsx("px-4 py-1.5 text-xs font-semibold capitalize border transition-all",
-              status === s ? "bg-black text-white border-black" : "bg-white text-black/60 border-black/20 hover:border-black hover:text-black"
-            )}>{s}</button>
+        {["all", ...DELIVERY_STATUSES].map((s) => (
+          <button
+            key={s}
+            onClick={() => {
+              setStatus(s);
+              setPage(1);
+            }}
+            className={clsx(
+              "px-4 py-1.5 text-xs font-semibold capitalize border transition-all",
+              status === s
+                ? "bg-black text-white border-black"
+                : "bg-white text-black/60 border-black/20 hover:border-black hover:text-black"
+            )}
+          >
+            {s}
+          </button>
         ))}
       </div>
-      {loading ? <Skeleton rows={6} /> : (
+
+      {/* TABLE */}
+      {loading ? (
+        <Skeleton rows={6} />
+      ) : (
         <Card>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-black/40 text-xs uppercase tracking-widest border-b border-black/10 bg-black/2">
-                {["Order ID","User","Items","Subtotal","Delivery","Total","Status"].map(h => (
-                  <th key={h} className="px-5 py-3 text-left font-semibold">{h}</th>
+                {[
+                  "Order ID",
+                  "Product",
+                  "User",
+                  "Items",
+                  "Subtotal",
+                  "Delivery",
+                  "Total",
+                  "Status",
+                  "Action",
+                ].map((h) => (
+                  <th key={h} className="px-5 py-3 text-left font-semibold">
+                    {h}
+                  </th>
                 ))}
               </tr>
             </thead>
+
             <tbody>
               {orders.map((o, i) => (
-                <tr key={i} className="border-t border-black/6 hover:bg-black/2 transition-all">
-                  <td className="px-5 py-3 font-mono text-xs font-bold text-black/40">#{String(o._id).slice(-6).toUpperCase()}</td>
-                  <td className="px-5 py-3 text-xs text-black/50 truncate max-w-[100px]">{o?.userId?.name}</td>
-                  <td className="px-5 py-3 text-black/60">{o.items?.length ?? 0}</td>
+                <tr
+                  key={i}
+                  className="border-t border-black/6 hover:bg-black/2 transition-all"
+                >
+                  {/* Order ID */}
+                  <td className="px-5 py-3 font-mono text-xs font-bold text-black/40">
+                    #{String(o._id).slice(-6).toUpperCase()}
+                  </td>
+
+                  {/* ✅ FIXED IMAGE */}
+                  <td className="px-5 py-3">
+                    <Image
+                      src={o.items[0]?.image}
+                      alt="Product"
+                      width={50}
+                      height={50}
+                      className="rounded object-cover"
+                    />
+                  </td>
+
+                  {/* User */}
+                  <td className="px-5 py-3 text-xs text-black/50 truncate max-w-[120px]">
+                    {o?.userId?.name}
+                  </td>
+
+                  {/* Items */}
+                  <td className="px-5 py-3 text-black/60">
+                    {o.items?.length ?? 0}
+                  </td>
+
+                  {/* Prices */}
                   <td className="px-5 py-3">{fmt(o.subtotal)}</td>
                   <td className="px-5 py-3">{fmt(o.deliveryFee)}</td>
-                  <td className="px-5 py-3 font-black">{fmt(o.total)}</td>
+                  <td className="px-5 py-3 font-black">
+                    {fmt(o.total)}
+                  </td>
+
+                  {/* Status */}
                   <td className="px-5 py-3">
-                    <select value={o.deliveryStatus} onChange={e => updateStatus(o._id, e.target.value)}
-                      className="bg-white border border-black/20 px-2 py-1 text-xs capitalize focus:outline-none focus:border-black cursor-pointer font-medium">
-                      {DELIVERY_STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                    <select
+                      value={o.deliveryStatus}
+                      onChange={(e) =>
+                        updateStatus(o._id, e.target.value)
+                      }
+                      className="bg-white border border-black/20 px-2 py-1 text-xs capitalize"
+                    >
+                      {DELIVERY_STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
                     </select>
+                  </td>
+
+                  {/* ✅ VIEW BUTTON */}
+                  <td className="px-5 py-3">
+                    <button
+                      onClick={() => setSelectedOrder(o)}
+                      className="text-xs px-3 py-1 bg-black text-white rounded"
+                    >
+                      View
+                    </button>
                   </td>
                 </tr>
               ))}
-              {orders.length === 0 && <tr><td colSpan={7} className="py-16 text-center text-black/30">No orders found</td></tr>}
+
+              {orders.length === 0 && (
+                <tr>
+                  <td
+                    colSpan={9}
+                    className="py-16 text-center text-black/30"
+                  >
+                    No orders found
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
-          <Pagination page={page} total={total} perPage={20} onPage={setPage} />
+
+          <Pagination
+            page={page}
+            total={total}
+            perPage={20}
+            onPage={setPage}
+          />
         </Card>
+      )}
+
+      {/* ✅ MODAL */}
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-[400px] relative">
+
+            <button
+              onClick={() => setSelectedOrder(null)}
+              className="absolute top-2 right-3 text-lg"
+            >
+              ✕
+            </button>
+
+            <h2 className="text-lg font-bold mb-4">
+              Order Details
+            </h2>
+
+            <img
+              src={selectedOrder.items[0]?.image}
+              className="w-24 h-24 object-cover rounded mb-3"
+            />
+
+            <p><strong>Order ID:</strong> {selectedOrder._id}</p>
+            <p><strong>Name:</strong> {selectedOrder.userId?.name}</p>
+            <p><strong>Email:</strong> {selectedOrder.userId?.email}</p>
+
+            <p><strong>Items:</strong> {selectedOrder.items.length}</p>
+            <p><strong>Subtotal:</strong> {fmt(selectedOrder.subtotal)}</p>
+            <p><strong>Delivery:</strong> {fmt(selectedOrder.deliveryFee)}</p>
+            <p><strong>Total:</strong> {fmt(selectedOrder.total)}</p>
+<div className="mt-3">
+  <p className="font-semibold mb-1">Address:</p>
+
+  <p className="text-sm text-black/70">
+    {selectedOrder.address?.fullName}
+  </p>
+
+  <p className="text-sm text-black/70">
+    {selectedOrder.address?.street}
+  </p>
+
+  <p className="text-sm text-black/70">
+    {selectedOrder.address?.city}, {selectedOrder.address?.state}
+  </p>
+
+  <p className="text-sm text-black/70">
+    {selectedOrder.address?.zip}
+  </p>
+</div>
+            <p className="capitalize">
+              <strong>Status:</strong> {selectedOrder.deliveryStatus}
+            </p>
+
+            <p>
+              <strong>Date:</strong>{" "}
+              {new Date(selectedOrder.createdAt).toLocaleString()}
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
