@@ -13,7 +13,7 @@ import RelatedProducts from "../../components/products/RelatedProducts";
 export default function ProductPage() {
   const params = useParams();
   const { id } = params;
-const [activeImage, setActiveImage] = useState(0);
+  const [activeImage, setActiveImage] = useState(0);
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,10 @@ const [activeImage, setActiveImage] = useState(0);
       if (!allData.success) throw new Error(allData.message);
 
       const relatedProducts = (allData.products ?? [])
-        .filter(p => p.category === data.product.category && p._id !== data.product._id)
+        .filter(
+          (p) =>
+            p.category === data.product.category && p._id !== data.product._id,
+        )
         .slice(0, 4);
 
       setRelated(relatedProducts);
@@ -50,62 +53,73 @@ const [activeImage, setActiveImage] = useState(0);
     loadProduct();
   }, [id, loadProduct]);
 
-if (loading || !product) {
-  return (
-    <main className="px-4 sm:px-8 lg:px-20 py-10 animate-pulse">
-      
-      {/* Breadcrumb Skeleton */}
-      <div className="h-4 w-1/3 bg-gray-200 rounded mb-6"></div>
+  if (loading || !product) {
+    return (
+      <main className="px-4 sm:px-8 lg:px-20 py-10 animate-pulse">
+        {/* Breadcrumb Skeleton */}
+        <div className="h-4 w-1/3 bg-gray-200 rounded mb-6"></div>
 
-      {/* Product Section Skeleton */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
-        
-        {/* Image Skeleton */}
-        <div className="bg-gray-200 rounded-2xl min-h-[300px] sm:min-h-[380px] lg:min-h-[420px]" />
+        {/* Product Section Skeleton */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
+          {/* Image Skeleton */}
+          <div className="bg-gray-200 rounded-2xl min-h-[300px] sm:min-h-[380px] lg:min-h-[420px]" />
 
-        {/* Info Skeleton */}
-        <div className="flex flex-col gap-5">
-          <div className="h-8 bg-gray-200 w-3/4 rounded"></div>
-          <div className="h-4 bg-gray-200 w-1/4 rounded"></div>
-          <div className="h-6 bg-gray-200 w-1/3 rounded"></div>
+          {/* Info Skeleton */}
+          <div className="flex flex-col gap-5">
+            <div className="h-8 bg-gray-200 w-3/4 rounded"></div>
+            <div className="h-4 bg-gray-200 w-1/4 rounded"></div>
+            <div className="h-6 bg-gray-200 w-1/3 rounded"></div>
 
-          <div className="space-y-2">
-            <div className="h-3 bg-gray-200 w-full rounded"></div>
-            <div className="h-3 bg-gray-200 w-5/6 rounded"></div>
-            <div className="h-3 bg-gray-200 w-4/6 rounded"></div>
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-200 w-full rounded"></div>
+              <div className="h-3 bg-gray-200 w-5/6 rounded"></div>
+              <div className="h-3 bg-gray-200 w-4/6 rounded"></div>
+            </div>
+
+            <div className="h-10 bg-gray-200 w-1/2 rounded"></div>
+            <div className="h-10 bg-gray-200 w-full rounded-full"></div>
           </div>
-
-          <div className="h-10 bg-gray-200 w-1/2 rounded"></div>
-          <div className="h-10 bg-gray-200 w-full rounded-full"></div>
-        </div>
-
-      </section>
-    </main>
-  );
-}
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main>
       {/* Breadcrumb */}
       <nav className="px-4 sm:px-8 lg:px-20 py-4 text-sm text-gray-400 flex gap-2 items-center flex-wrap">
-        <Link href="/" className="hover:text-black">Home</Link>
+        <Link href="/" className="hover:text-black">
+          Home
+        </Link>
         <span>›</span>
-        <Link href="/shop" className="hover:text-black">Shop</Link>
+        <Link href="/shop" className="hover:text-black">
+          Shop
+        </Link>
         <span>›</span>
-        <Link href={`/shop/${product.category}`} className="hover:text-black">{product.category}</Link>
+        <Link href={`/shop/${product.category}`} className="hover:text-black">
+          {product.category}
+        </Link>
         <span>›</span>
         <span className="text-black">{product.title}</span>
       </nav>
 
       {/* Product Section */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 px-4 sm:px-8 lg:px-20 pb-16">
-        <ProductImages image={product.images} title={product.title}  active={activeImage}
-  setActive={setActiveImage} />
-        <ProductInfo product={product} activeImage={activeImage} setActiveImage={setActiveImage} />
+        <ProductImages
+          image={product.images}
+          title={product.title}
+          active={activeImage}
+          setActive={setActiveImage}
+        />
+        <ProductInfo
+          product={product}
+          activeImage={activeImage}
+          setActiveImage={setActiveImage}
+        />
       </section>
 
       {/* Reviews */}
-      <ReviewsSection />
+      <ReviewsSection productId={id} />
 
       {/* Related Products */}
       {related.length > 0 && (
