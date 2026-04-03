@@ -3,7 +3,6 @@ import { connectDB } from "@/lib/db";
 import Product from "@/models/Product";
 import jwt from "jsonwebtoken";
 
-// ✅ Fix 2: try-catch so invalid tokens return null instead of throwing
 function verifyAdmin(req) {
   try {
     const authHeader = req.headers.get("authorization");
@@ -59,7 +58,7 @@ export async function PATCH(req, context) {
   }
 }
 
-// ✅ Fix 1: await context.params — required in Next.js 15
+
 export async function DELETE(req, context) {
   try {
     await connectDB();
