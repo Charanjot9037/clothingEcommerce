@@ -641,47 +641,155 @@ function ProductsTab({ toast }) {
 }
 
 /* ── Product Form ── */
+const COLORS = [
+  { hex: "#4CAF50", label: "Green" },
+  { hex: "#F44336", label: "Red" },
+  { hex: "#FFC107", label: "Yellow" },
+  { hex: "#FF9800", label: "Orange" },
+  { hex: "#03A9F4", label: "Light Blue" },
+  { hex: "#9C27B0", label: "Purple" },
+  { hex: "#E91E63", label: "Pink" },
+  { hex: "#1a3458", label: "Navy" },
+  { hex: "#4a5c3d", label: "Olive" },
+  { hex: "#111111", label: "Black" },
+];
+
+function ColorPicker({ value = [], onChange }) {
+  const toggle = (hex) => {
+    const next = value.includes(hex)
+      ? value.filter((h) => h !== hex)
+      : [...value, hex];
+    onChange(next);
+  };
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2">
+        {COLORS.map((c) => (
+          <button
+            key={c.hex}
+            type="button"
+            title={c.label}
+            onClick={() => toggle(c.hex)}
+            className="relative w-8 h-8 rounded-full transition-transform hover:scale-110 focus:outline-none"
+            style={{
+              background: c.hex,
+              border: value.includes(c.hex)
+                ? "2.5px solid #000"
+                : "2px solid transparent",
+              boxShadow: value.includes(c.hex)
+                ? "0 0 0 1px #fff inset"
+                : undefined,
+              transform: value.includes(c.hex) ? "scale(1.12)" : undefined,
+            }}
+          >
+            {value.includes(c.hex) && (
+              <span
+                className="absolute inset-0 rounded-full flex items-center justify-center"
+                style={{ pointerEvents: "none" }}
+              >
+                <span className="block w-3 h-3 rounded-full border-2 border-white" />
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {value.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mt-2">
+          {COLORS.filter((c) => value.includes(c.hex)).map((c) => (
+            <span
+              key={c.hex}
+              className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full border border-black/10"
+              style={{ background: c.hex + "22" }}
+            >
+              <span
+                className="w-3 h-3 rounded-full inline-block flex-shrink-0"
+                style={{ background: c.hex }}
+              />
+              {c.label}
+              <button
+                type="button"
+                className="opacity-40 hover:opacity-100 leading-none ml-0.5"
+                onClick={() => toggle(c.hex)}
+              >
+                ×
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Product Form ── */
 function ProductForm({ initial, onSubmit, onCancel }) {
   const blank = {
-    title: "", price: "", oldPrice: "", discount: "", category: "",
+    title: "",
+    price: "",
+    oldPrice: "",
+    discount: "",
+    category: "",
     images: ["", "", ""],
-    rating: "", description: "", sizes: "", colors: "", stock: "", featured: false,
+    rating: "",
+    description: "",
+    sizes: "",
+    colors: [],
+    stock: "",
+    featured: false,
     reviews: [{}, {}, {}],
   };
+
   const [form, setForm] = useState(
-    initial ? {
-      ...blank, ...initial,
-      sizes:  (initial.sizes  ?? []).join(", "),
-      colors: (initial.colors ?? []).join(", "),
-      images: initial.images?.length ? initial.images : ["", "", ""],
-    } : blank
+    initial
+      ? {
+          ...blank,
+          ...initial,
+          sizes: (initial.sizes ?? []).join(", "),
+          colors: initial.colors ?? [],
+          images: initial.images?.length ? initial.images : ["", "", ""],
+        }
+      : blank
   );
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
 
-  const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErrors(e => ({ ...e, [k]: null })); };
+  const set = (k, v) => {
+    setForm((f) => ({ ...f, [k]: v }));
+    setErrors((e) => ({ ...e, [k]: null }));
+  };
+
   const validate = () => {
     const e = {};
     if (!form.title.trim()) e.title = "Required";
-    if (!form.price || isNaN(+form.price) || +form.price <= 0) e.price = "Valid price required";
+    if (!form.price || isNaN(+form.price) || +form.price <= 0)
+      e.price = "Valid price required";
     if (!form.category.trim()) e.category = "Required";
     return e;
   };
+
   const submit = async (ev) => {
     ev.preventDefault();
     const e = validate();
-    if (Object.keys(e).length) { setErrors(e); return; }
+    if (Object.keys(e).length) {
+      setErrors(e);
+      return;
+    }
     setSaving(true);
     await onSubmit({
       ...form,
-      price:    +form.price,
+      price: +form.price,
       oldPrice: form.oldPrice ? +form.oldPrice : null,
       discount: form.discount ? +form.discount : 0,
-      rating:   form.rating   ? +form.rating   : 0,
-      stock:    form.stock    ? +form.stock    : 0,
-      sizes:    form.sizes.split(",").map(s => s.trim()).filter(Boolean),
-      colors:   form.colors.split(",").map(s => s.trim()).filter(Boolean),
-      images:   (form.images ?? []).filter(Boolean),
+      rating: form.rating ? +form.rating : 0,
+      stock: form.stock ? +form.stock : 0,
+      sizes: form.sizes
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      colors: form.colors, // already an array of hex strings
+      images: (form.images ?? []).filter(Boolean),
     });
     setSaving(false);
   };
@@ -689,41 +797,106 @@ function ProductForm({ initial, onSubmit, onCancel }) {
   return (
     <div>
       <div className="flex items-center gap-4 mb-6">
-        <button onClick={onCancel} className="text-black/40 hover:text-black text-xl">←</button>
-        <PageHeader title={initial ? "Edit Product" : "Add Product"} sub="Saved to MongoDB" compact />
+        <button onClick={onCancel} className="text-black/40 hover:text-black text-xl">
+          ←
+        </button>
+        <PageHeader
+          title={initial ? "Edit Product" : "Add Product"}
+          sub="Saved to MongoDB"
+          compact
+        />
       </div>
 
-      <form onSubmit={submit} className="bg-white border border-black/10 p-4 md:p-8 max-w-3xl">
+      <form
+        onSubmit={submit}
+        className="bg-white border border-black/10 p-4 md:p-8 max-w-3xl"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
           <Field label="Title *" error={errors.title} span2>
-            <input value={form.title} onChange={e => set("title", e.target.value)} placeholder="Classic White T-Shirt" className={inp(errors.title)} />
-          </Field>
-          <Field label="Price ($) *" error={errors.price}>
-            <input type="number" min="0" step="0.01" value={form.price} onChange={e => set("price", e.target.value)} placeholder="29.99" className={inp(errors.price)} />
-          </Field>
-          <Field label="Old Price ($)">
-            <input type="number" min="0" step="0.01" value={form.oldPrice} onChange={e => set("oldPrice", e.target.value)} placeholder="39.99" className={inp()} />
-          </Field>
-          <Field label="Discount (%)">
-            <input type="number" min="0" max="100" value={form.discount} onChange={e => set("discount", e.target.value)} placeholder="20" className={inp()} />
-          </Field>
-          <Field label="Category *" error={errors.category}>
-            <input value={form.category} onChange={e => set("category", e.target.value)} placeholder="men / women / kids" className={inp(errors.category)} />
-          </Field>
-          <Field label="Stock">
-            <input type="number" min="0" value={form.stock} onChange={e => set("stock", e.target.value)} placeholder="100" className={inp()} />
-          </Field>
-          <Field label="Rating (0–5)">
-            <input type="number" min="0" max="5" step="0.1" value={form.rating} onChange={e => set("rating", e.target.value)} placeholder="4.5" className={inp()} />
+            <input
+              value={form.title}
+              onChange={(e) => set("title", e.target.value)}
+              placeholder="Classic White T-Shirt"
+              className={inp(errors.title)}
+            />
           </Field>
 
-          {[0, 1, 2].map(i => (
+          <Field label="Price ($) *" error={errors.price}>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={form.price}
+              onChange={(e) => set("price", e.target.value)}
+              placeholder="0000"
+              className={inp(errors.price)}
+            />
+          </Field>
+
+          <Field label="Old Price ($)">
+            <input
+              type="number"
+              min="0"
+              step="1"
+              value={form.oldPrice}
+              onChange={(e) => set("oldPrice", e.target.value)}
+              placeholder="0000"
+              className={inp()}
+            />
+          </Field>
+
+          <Field label="Discount (%)">
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={form.discount}
+              onChange={(e) => set("discount", e.target.value)}
+              placeholder="20"
+              className={inp()}
+            />
+          </Field>
+
+          <Field label="Category *" error={errors.category}>
+            <input
+              value={form.category}
+              onChange={(e) => set("category", e.target.value)}
+              placeholder="men / women / kids"
+              className={inp(errors.category)}
+            />
+          </Field>
+
+          <Field label="Stock">
+            <input
+              type="number"
+              min="0"
+              value={form.stock}
+              onChange={(e) => set("stock", e.target.value)}
+              placeholder="100"
+              className={inp()}
+            />
+          </Field>
+
+          <Field label="Rating (0–5)">
+            <input
+              type="number"
+              min="0"
+              max="5"
+              step="0.1"
+              value={form.rating}
+              onChange={(e) => set("rating", e.target.value)}
+              placeholder="4.5"
+              className={inp()}
+            />
+          </Field>
+
+          {[0, 1, 2].map((i) => (
             <CloudinaryImageUpload
               key={i}
               index={i}
               label={`Gallery Image ${i + 1}`}
               value={form.images?.[i] ?? ""}
-              onChange={url => {
+              onChange={(url) => {
                 const imgs = [...(form.images ?? ["", "", ""])];
                 imgs[i] = url;
                 set("images", imgs);
@@ -735,9 +908,18 @@ function ProductForm({ initial, onSubmit, onCancel }) {
             <div className="md:col-span-2 flex gap-2 flex-wrap">
               {(form.images ?? []).map((url, i) =>
                 url ? (
-                  <div key={i} className="flex-1 min-w-[80px] border border-black/10 overflow-hidden">
-                    <img src={url} alt={`gallery-${i + 1}`} className="w-full h-24 md:h-28 object-cover" />
-                    <div className="px-2 py-1 bg-black/3 text-xs text-black/35">Image {i + 1}</div>
+                  <div
+                    key={i}
+                    className="flex-1 min-w-[80px] border border-black/10 overflow-hidden"
+                  >
+                    <img
+                      src={url}
+                      alt={`gallery-${i + 1}`}
+                      className="w-full h-24 md:h-28 object-cover"
+                    />
+                    <div className="px-2 py-1 bg-black/3 text-xs text-black/35">
+                      Image {i + 1}
+                    </div>
                   </div>
                 ) : null
               )}
@@ -745,26 +927,52 @@ function ProductForm({ initial, onSubmit, onCancel }) {
           )}
 
           <Field label="Sizes (comma-separated)">
-            <input value={form.sizes} onChange={e => set("sizes", e.target.value)} placeholder="XS, S, M, L, XL" className={inp()} />
+            <input
+              value={form.sizes}
+              onChange={(e) => set("sizes", e.target.value)}
+              placeholder="XS, S, M, L, XL"
+              className={inp()}
+            />
           </Field>
-          <Field label="Colors (comma-separated)">
-            <input value={form.colors} onChange={e => set("colors", e.target.value)} placeholder="#000000, #ffffff" className={inp()} />
+
+          <Field label="Colors">
+            <ColorPicker
+              value={form.colors}
+              onChange={(v) => set("colors", v)}
+            />
           </Field>
+
           <Field label="Description" span2>
-            <textarea rows={3} value={form.description} onChange={e => set("description", e.target.value)} placeholder="Short product description…" className={inp() + " resize-none"} />
+            <textarea
+              rows={3}
+              value={form.description}
+              onChange={(e) => set("description", e.target.value)}
+              placeholder="Short product description…"
+              className={inp() + " resize-none"}
+            />
           </Field>
 
           <div className="md:col-span-2">
-            <Toggle label="Feature on homepage" value={form.featured} onChange={v => set("featured", v)} />
+            <Toggle
+              label="Feature on homepage"
+              value={form.featured}
+              onChange={(v) => set("featured", v)}
+            />
           </div>
 
           <div className="md:col-span-2 flex flex-wrap gap-3 pt-4 border-t border-black/10">
-            <button type="submit" disabled={saving}
-              className="bg-black text-white font-bold px-6 md:px-8 py-3 text-sm hover:bg-black/80 disabled:opacity-50 transition-all uppercase tracking-wide">
+            <button
+              type="submit"
+              disabled={saving}
+              className="bg-black text-white font-bold px-6 md:px-8 py-3 text-sm hover:bg-black/80 disabled:opacity-50 transition-all uppercase tracking-wide"
+            >
               {saving ? "Saving…" : initial ? "Save Changes" : "Add to Shop"}
             </button>
-            <button type="button" onClick={onCancel}
-              className="border border-black/20 text-black/60 px-5 md:px-6 py-3 text-sm font-medium hover:border-black hover:text-black transition-all">
+            <button
+              type="button"
+              onClick={onCancel}
+              className="border border-black/20 text-black/60 px-5 md:px-6 py-3 text-sm font-medium hover:border-black hover:text-black transition-all"
+            >
               Cancel
             </button>
           </div>
@@ -773,7 +981,6 @@ function ProductForm({ initial, onSubmit, onCancel }) {
     </div>
   );
 }
-
 /* ═══════════════════════════════════════════════════════════════
    USERS
 ═══════════════════════════════════════════════════════════════ */
