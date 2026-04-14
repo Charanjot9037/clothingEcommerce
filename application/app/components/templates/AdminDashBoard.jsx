@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import clsx from "clsx";
 import CloudinaryImageUpload from "./CloudinaryUpload";
 import Image from "next/image";
+import Link from "next/link";
 
 const getToken = () =>
   typeof window !== "undefined" ? localStorage.getItem("token") : null;
@@ -33,6 +34,19 @@ const TABS = [
   { label: "Analytics", icon: "📊", key: "analytics" },
 ];
 
+const COLORS = [
+  { hex: "#4CAF50", label: "Green" },
+  { hex: "#F44336", label: "Red" },
+  { hex: "#FFC107", label: "Yellow" },
+  { hex: "#FF9800", label: "Orange" },
+  { hex: "#03A9F4", label: "Light Blue" },
+  { hex: "#9C27B0", label: "Purple" },
+  { hex: "#E91E63", label: "Pink" },
+  { hex: "#1a3458", label: "Navy" },
+  { hex: "#4a5c3d", label: "Olive" },
+  { hex: "#111111", label: "Black" },
+];
+
 /* ═══════════════════════════════════════════════════════════════
    ROOT
 ═══════════════════════════════════════════════════════════════ */
@@ -46,18 +60,17 @@ export default function AdminDashboard() {
     setTimeout(() => setToast(null), 3200);
   }, []);
 
-  /* close sidebar on tab change (mobile) */
   const handleTab = (key) => {
     setTab(key);
     setSidebarOpen(false);
   };
 
   return (
+    
     <div
       className="min-h-screen bg-white text-black"
       style={{ fontFamily: "'Satoshi','DM Sans','Segoe UI',sans-serif" }}
     >
-      {/* Toast */}
       {toast && (
         <div className={clsx(
           "fixed top-4 right-4 z-[60] px-5 py-3 text-sm font-semibold shadow-lg border max-w-[calc(100vw-2rem)]",
@@ -69,7 +82,6 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-30 md:hidden"
@@ -78,15 +90,12 @@ export default function AdminDashboard() {
       )}
 
       <div className="flex h-screen overflow-hidden">
-
-        {/* ── SIDEBAR ── */}
         <aside className={clsx(
           "fixed md:relative inset-y-0 left-0 z-40 w-56 flex-shrink-0",
           "bg-gradient-to-b from-gray-950 to-slate-800 text-white",
           "flex flex-col py-8 px-5 gap-0.5 transition-transform duration-300",
           sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
         )}>
-          {/* Logo */}
           <div className="mb-8 px-2">
             <div className="text-xl font-black tracking-widest text-white">SHOP.CO</div>
             <div className="text-[10px] text-white/40 tracking-widest mt-1 uppercase">Admin</div>
@@ -109,22 +118,18 @@ export default function AdminDashboard() {
           ))}
 
           <div className="mt-auto pt-6 border-t border-white/10">
-            <a
+            <Link
               href="/"
               className="flex items-center gap-3 px-3 py-2.5 text-sm text-white/40 hover:text-white hover:bg-white/10 transition-all"
             >
               <span className="w-5 text-center">↩</span> View Store
-            </a>
+            </Link>
           </div>
         </aside>
 
-        {/* ── MAIN ── */}
         <main className="flex-1 overflow-y-auto bg-[#f2f0f1] min-w-0">
-
-          {/* Topbar */}
           <div className="bg-white border-b border-black/10 px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-20">
             <div className="flex items-center gap-3">
-              {/* Hamburger — mobile only */}
               <button
                 className="md:hidden flex flex-col gap-1 p-1"
                 onClick={() => setSidebarOpen(o => !o)}
@@ -147,7 +152,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Content */}
           <div className="p-4 md:p-8">
             {tab === "overview"  && <OverviewTab  onNav={handleTab} toast={showToast} />}
             {tab === "orders"    && <OrdersTab    toast={showToast} />}
@@ -156,7 +160,6 @@ export default function AdminDashboard() {
             {tab === "analytics" && <AnalyticsTab toast={showToast} />}
           </div>
 
-          {/* Mobile bottom nav */}
           <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-black border-t border-white/10 flex z-20">
             {TABS.map(t => (
               <button
@@ -173,12 +176,12 @@ export default function AdminDashboard() {
             ))}
           </nav>
 
-          {/* Bottom nav spacer on mobile */}
           <div className="h-16 md:hidden" />
         </main>
       </div>
     </div>
-  );
+    
+  )
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -214,7 +217,6 @@ function OverviewTab({ onNav, toast }) {
     <div>
       <PageHeader title="Overview" sub="Your store at a glance — last 30 days" />
 
-      {/* Stat cards — 2 cols mobile, 3 tablet, 5 desktop */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3 mb-6">
         {cards.map((c, i) => (
           <div
@@ -233,9 +235,7 @@ function OverviewTab({ onNav, toast }) {
         ))}
       </div>
 
-      {/* Recent orders — card layout on mobile, table on md+ */}
       <Card title="Recent Orders" action={{ label: "View all →", fn: () => onNav("orders") }}>
-        {/* Mobile cards */}
         <div className="md:hidden divide-y divide-black/6">
           {orders.map((o, i) => (
             <div key={i} className="p-4 flex gap-3 items-start">
@@ -261,7 +261,6 @@ function OverviewTab({ onNav, toast }) {
           {orders.length === 0 && <p className="p-8 text-center text-black/30 text-sm">No orders yet</p>}
         </div>
 
-        {/* Desktop table */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-sm">
             <tbody>
@@ -348,7 +347,6 @@ function OrdersTab({ toast }) {
     <div>
       <PageHeader title="Orders" sub={`${total} total orders`} />
 
-      {/* Filter pills */}
       <div className="flex gap-2 mb-5 flex-wrap">
         {["all", ...DELIVERY_STATUSES].map(s => (
           <button key={s} onClick={() => { setStatus(s); setPage(1); }}
@@ -443,7 +441,7 @@ function OrdersTab({ toast }) {
         </Card>
       )}
 
-      {/* Order detail modal */}
+      {/* ── Order detail modal ── */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white w-full max-w-md max-h-[90vh] overflow-y-auto relative rounded-lg">
@@ -451,21 +449,57 @@ function OrdersTab({ toast }) {
               <h2 className="text-base font-black uppercase tracking-wide">Order Details</h2>
               <button onClick={() => setSelectedOrder(null)} className="text-black/40 hover:text-black text-xl leading-none">✕</button>
             </div>
-            <div className="p-5 space-y-3">
+
+            <div className="p-5 space-y-4">
+
+              {/* First item image */}
               {selectedOrder.items[0]?.image && (
                 <img src={selectedOrder.items[0].image} className="w-20 h-20 object-cover rounded" alt="" />
               )}
+
+              {/* Order meta grid */}
               <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                <div><span className="text-black/40 text-xs uppercase tracking-wide block">Order ID</span><span className="font-mono font-bold text-xs">{String(selectedOrder._id).slice(-6).toUpperCase()}</span></div>
-                <div><span className="text-black/40 text-xs uppercase tracking-wide block">Date</span><span className="font-medium text-xs">{new Date(selectedOrder.createdAt).toLocaleString()}</span></div>
-                <div><span className="text-black/40 text-xs uppercase tracking-wide block">Name</span><span className="font-semibold">{selectedOrder.userId?.name || "Guest"}</span></div>
-                <div><span className="text-black/40 text-xs uppercase tracking-wide block">Email</span><span className="text-xs">{selectedOrder.userId?.email || "—"}</span></div>
-                <div><span className="text-black/40 text-xs uppercase tracking-wide block">Items</span><span className="font-semibold">{selectedOrder.items.length}</span></div>
-                <div><span className="text-black/40 text-xs uppercase tracking-wide block">Status</span><span className={clsx("text-xs font-bold capitalize px-2 py-0.5 rounded-full", STATUS_PILL[selectedOrder.deliveryStatus])}>{selectedOrder.deliveryStatus}</span></div>
-                <div><span className="text-black/40 text-xs uppercase tracking-wide block">Subtotal</span><span className="font-semibold">{fmt(selectedOrder.subtotal)}</span></div>
-                <div><span className="text-black/40 text-xs uppercase tracking-wide block">Delivery</span><span className="font-semibold">{fmt(selectedOrder.deliveryFee)}</span></div>
-                <div className="col-span-2"><span className="text-black/40 text-xs uppercase tracking-wide block">Total</span><span className="text-xl font-black">{fmt(selectedOrder.total)}</span></div>
+                <div>
+                  <span className="text-black/40 text-xs uppercase tracking-wide block">Order ID</span>
+                  <span className="font-mono font-bold text-xs">{String(selectedOrder._id).slice(-6).toUpperCase()}</span>
+                </div>
+                <div>
+                  <span className="text-black/40 text-xs uppercase tracking-wide block">Date</span>
+                  <span className="font-medium text-xs">{new Date(selectedOrder.createdAt).toLocaleString()}</span>
+                </div>
+                <div>
+                  <span className="text-black/40 text-xs uppercase tracking-wide block">Name</span>
+                  <span className="font-semibold">{selectedOrder.userId?.name || "Guest"}</span>
+                </div>
+                <div>
+                  <span className="text-black/40 text-xs uppercase tracking-wide block">Email</span>
+                  <span className="text-xs">{selectedOrder.userId?.email || "—"}</span>
+                </div>
+                <div>
+                  <span className="text-black/40 text-xs uppercase tracking-wide block">Items</span>
+                  <span className="font-semibold">{selectedOrder.items.length}</span>
+                </div>
+                <div>
+                  <span className="text-black/40 text-xs uppercase tracking-wide block">Status</span>
+                  <span className={clsx("text-xs font-bold capitalize px-2 py-0.5 rounded-full", STATUS_PILL[selectedOrder.deliveryStatus])}>
+                    {selectedOrder.deliveryStatus}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-black/40 text-xs uppercase tracking-wide block">Subtotal</span>
+                  <span className="font-semibold">{fmt(selectedOrder.subtotal)}</span>
+                </div>
+                <div>
+                  <span className="text-black/40 text-xs uppercase tracking-wide block">Delivery</span>
+                  <span className="font-semibold">{fmt(selectedOrder.deliveryFee)}</span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-black/40 text-xs uppercase tracking-wide block">Total</span>
+                  <span className="text-xl font-black">{fmt(selectedOrder.total)}</span>
+                </div>
               </div>
+
+              {/* Shipping address */}
               {selectedOrder.address && (
                 <div className="border-t border-black/10 pt-3">
                   <div className="text-black/40 text-xs uppercase tracking-wide mb-2">Shipping Address</div>
@@ -476,23 +510,58 @@ function OrdersTab({ toast }) {
                   </div>
                 </div>
               )}
-              {/* All items */}
-              {selectedOrder.items.length > 1 && (
-                <div className="border-t border-black/10 pt-3">
-                  <div className="text-black/40 text-xs uppercase tracking-wide mb-2">All Items</div>
-                  <div className="space-y-2">
-                    {selectedOrder.items.map((item, i) => (
-                      <div key={i} className="flex gap-2 items-center">
-                        {item.image && <img src={item.image} alt="" className="w-10 h-10 object-cover rounded" />}
-                        <div className="flex-1 min-w-0">
-                          <div className="text-xs font-semibold truncate">{item.title}</div>
-                          <div className="text-xs text-black/40">x{item.quantity} · {fmt(item.price)}</div>
+
+              {/* All items — always shown, with color + size */}
+              <div className="border-t border-black/10 pt-3">
+                <div className="text-black/40 text-xs uppercase tracking-wide mb-2">
+                  {selectedOrder.items.length === 1 ? "Item" : "All Items"}
+                </div>
+                <div className="space-y-3">
+                  {selectedOrder.items.map((item, i) => (
+                    <div key={i} className="flex gap-3 items-start">
+                      {item.image && (
+                        <img src={item.image} alt="" className="w-12 h-12 object-cover rounded flex-shrink-0 border border-black/8" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-semibold truncate mb-1">{item.title}</div>
+
+                        {/* Color + Size + Qty row */}
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {/* Color dot */}
+                          {item.selectedColor && (
+                            <span className="flex items-center gap-1 text-[10px] text-black/50 font-medium">
+                              <span
+                                className="w-3.5 h-3.5 rounded-full border border-black/15 inline-block flex-shrink-0"
+                                style={{ background: item.selectedColor }}
+                              />
+                              {COLORS.find(c => c.hex === item.selectedColor)?.label ?? item.selectedColor}
+                            </span>
+                          )}
+
+                          {/* Divider */}
+                          {item.selectedColor && item.selectedSize && (
+                            <span className="text-black/20 text-xs">·</span>
+                          )}
+
+                          {/* Size */}
+                          {item.selectedSize && (
+                            <span className="text-[10px] text-black/50 font-medium bg-black/5 px-1.5 py-0.5 rounded">
+                              {item.selectedSize}
+                            </span>
+                          )}
+
+                          {/* Qty + Price */}
+                          <span className="text-black/20 text-xs">·</span>
+                          <span className="text-[10px] text-black/40">
+                            x{item.quantity} · {fmt(item.price)}
+                          </span>
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
+
             </div>
           </div>
         </div>
@@ -560,7 +629,6 @@ function ProductsTab({ toast }) {
 
       {loading ? <Skeleton rows={5} /> : (
         <Card>
-          {/* Mobile cards */}
           <div className="md:hidden divide-y divide-black/6">
             {products.map((p, i) => (
               <div key={i} className="p-4 flex gap-3 items-start">
@@ -579,6 +647,14 @@ function ProductsTab({ toast }) {
                   <div className={clsx("text-xs font-semibold mt-1", p.stock <= 5 ? "text-red-500" : "text-black/40")}>
                     Stock: {p.stock}
                   </div>
+                  {/* Color dots preview */}
+                  {p.colors?.length > 0 && (
+                    <div className="flex gap-1 mt-1.5">
+                      {p.colors.map((hex, ci) => (
+                        <span key={ci} className="w-4 h-4 rounded-full border border-black/10 flex-shrink-0" style={{ background: hex }} title={hex} />
+                      ))}
+                    </div>
+                  )}
                   <div className="flex gap-2 mt-2">
                     <button onClick={() => { setEditing(p); setView("edit"); }}
                       className="text-xs font-semibold border border-black px-3 py-1 hover:bg-black hover:text-white transition-all">Edit</button>
@@ -591,12 +667,11 @@ function ProductsTab({ toast }) {
             {products.length === 0 && <p className="p-8 text-center text-black/30 text-sm">No products yet</p>}
           </div>
 
-          {/* Desktop table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-black/40 text-xs uppercase tracking-widest border-b border-black/10 bg-black/2">
-                  {["Product","Category","Price","Old Price","Discount","Stock","Actions"].map(h => (
+                  {["Product","Category","Price","Old Price","Discount","Stock","Colors","Actions"].map(h => (
                     <th key={h} className="px-5 py-3 text-left font-semibold whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
@@ -619,6 +694,16 @@ function ProductsTab({ toast }) {
                     <td className="px-5 py-3">{p.discount ? <span className="bg-black text-white text-xs font-bold px-2 py-0.5">{p.discount}% OFF</span> : "—"}</td>
                     <td className={clsx("px-5 py-3 font-bold", p.stock <= 5 ? "text-red-500" : "text-black/60")}>{p.stock}</td>
                     <td className="px-5 py-3">
+                      <div className="flex gap-1 flex-wrap">
+                        {p.colors?.length > 0
+                          ? p.colors.map((hex, ci) => (
+                              <span key={ci} className="w-5 h-5 rounded-full border border-black/10 flex-shrink-0" style={{ background: hex }} title={COLORS.find(c => c.hex === hex)?.label ?? hex} />
+                            ))
+                          : <span className="text-black/25 text-xs">—</span>
+                        }
+                      </div>
+                    </td>
+                    <td className="px-5 py-3">
                       <div className="flex gap-2">
                         <button onClick={() => { setEditing(p); setView("edit"); }}
                           className="text-xs font-semibold border border-black px-3 py-1 hover:bg-black hover:text-white transition-all whitespace-nowrap">Edit</button>
@@ -628,7 +713,7 @@ function ProductsTab({ toast }) {
                     </td>
                   </tr>
                 ))}
-                {products.length === 0 && <tr><td colSpan={7} className="py-16 text-center text-black/30">No products yet</td></tr>}
+                {products.length === 0 && <tr><td colSpan={8} className="py-16 text-center text-black/30">No products yet</td></tr>}
               </tbody>
             </table>
           </div>
@@ -640,85 +725,75 @@ function ProductsTab({ toast }) {
   );
 }
 
-/* ── Product Form ── */
-const COLORS = [
-  { hex: "#4CAF50", label: "Green" },
-  { hex: "#F44336", label: "Red" },
-  { hex: "#FFC107", label: "Yellow" },
-  { hex: "#FF9800", label: "Orange" },
-  { hex: "#03A9F4", label: "Light Blue" },
-  { hex: "#9C27B0", label: "Purple" },
-  { hex: "#E91E63", label: "Pink" },
-  { hex: "#1a3458", label: "Navy" },
-  { hex: "#4a5c3d", label: "Olive" },
-  { hex: "#111111", label: "Black" },
-];
+/* ── Color Picker (image-linked) ── */
+function ColorPicker({ value = [], images = [], onChange }) {
+  const activeSlots = [0, 1, 2].filter((i) => images[i]);
 
-function ColorPicker({ value = [], onChange }) {
-  const toggle = (hex) => {
-    const next = value.includes(hex)
-      ? value.filter((h) => h !== hex)
-      : [...value, hex];
-    onChange(next);
+  const setColorForSlot = (hex, slotIndex) => {
+    // Build a new colors array aligned to images
+    // value[i] = color for images[i]
+    const next = [...value];
+    // Ensure array is long enough
+    while (next.length <= slotIndex) next.push(null);
+    next[slotIndex] = next[slotIndex] === hex ? null : hex;
+    // Clean: remove trailing nulls, filter nulls for storage
+    onChange(next.map(v => v ?? null));
   };
 
-  return (
-    <div>
-      <div className="flex flex-wrap gap-2">
-        {COLORS.map((c) => (
-          <button
-            key={c.hex}
-            type="button"
-            title={c.label}
-            onClick={() => toggle(c.hex)}
-            className="relative w-8 h-8 rounded-full transition-transform hover:scale-110 focus:outline-none"
-            style={{
-              background: c.hex,
-              border: value.includes(c.hex)
-                ? "2.5px solid #000"
-                : "2px solid transparent",
-              boxShadow: value.includes(c.hex)
-                ? "0 0 0 1px #fff inset"
-                : undefined,
-              transform: value.includes(c.hex) ? "scale(1.12)" : undefined,
-            }}
-          >
-            {value.includes(c.hex) && (
-              <span
-                className="absolute inset-0 rounded-full flex items-center justify-center"
-                style={{ pointerEvents: "none" }}
-              >
-                <span className="block w-3 h-3 rounded-full border-2 border-white" />
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+  // Reconstruct per-slot selection from flat value array
+  // value is stored as array aligned with images indices
+  const getSlotColor = (slotIndex) => value[slotIndex] ?? null;
 
-      {value.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mt-2">
-          {COLORS.filter((c) => value.includes(c.hex)).map((c) => (
-            <span
-              key={c.hex}
-              className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full border border-black/10"
-              style={{ background: c.hex + "22" }}
-            >
-              <span
-                className="w-3 h-3 rounded-full inline-block flex-shrink-0"
-                style={{ background: c.hex }}
-              />
-              {c.label}
-              <button
-                type="button"
-                className="opacity-40 hover:opacity-100 leading-none ml-0.5"
-                onClick={() => toggle(c.hex)}
-              >
-                ×
-              </button>
+  if (activeSlots.length === 0) {
+    return (
+      <p className="text-xs text-black/30 italic py-1">
+        Upload images above first, then assign a color to each.
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      {activeSlots.map((i) => (
+        <div key={i} className="flex items-start gap-3">
+          {/* Thumbnail */}
+          <img
+            src={images[i]}
+            alt={`img-${i + 1}`}
+            className="w-10 h-10 object-cover flex-shrink-0 border border-black/10"
+          />
+          <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+            <span className="text-[10px] text-black/35 uppercase tracking-widest font-semibold">
+              Image {i + 1}
+              {getSlotColor(i) && (
+                <span className="ml-2 normal-case tracking-normal font-normal text-black/50">
+                  → {COLORS.find(c => c.hex === getSlotColor(i))?.label}
+                </span>
+              )}
             </span>
-          ))}
+            <div className="flex flex-wrap gap-1.5">
+              {COLORS.map((c) => {
+                const selected = getSlotColor(i) === c.hex;
+                return (
+                  <button
+                    key={c.hex}
+                    type="button"
+                    title={c.label}
+                    onClick={() => setColorForSlot(c.hex, i)}
+                    className="w-6 h-6 rounded-full transition-transform hover:scale-110 focus:outline-none flex-shrink-0"
+                    style={{
+                      background: c.hex,
+                      border: selected ? "2.5px solid #000" : "2px solid transparent",
+                      boxShadow: selected ? "0 0 0 1px #fff inset" : undefined,
+                      transform: selected ? "scale(1.12)" : undefined,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }
@@ -735,7 +810,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
     rating: "",
     description: "",
     sizes: "",
-    colors: [],
+    colors: [null, null, null],
     stock: "",
     featured: false,
     reviews: [{}, {}, {}],
@@ -747,8 +822,13 @@ function ProductForm({ initial, onSubmit, onCancel }) {
           ...blank,
           ...initial,
           sizes: (initial.sizes ?? []).join(", "),
-          colors: initial.colors ?? [],
-          images: initial.images?.length ? initial.images : ["", "", ""],
+          // Pad colors to 3 slots aligned with images
+          colors: [
+            initial.colors?.[0] ?? null,
+            initial.colors?.[1] ?? null,
+            initial.colors?.[2] ?? null,
+          ],
+          images: initial.images?.length ? [...initial.images, "", "", ""].slice(0, 3) : ["", "", ""],
         }
       : blank
   );
@@ -772,24 +852,23 @@ function ProductForm({ initial, onSubmit, onCancel }) {
   const submit = async (ev) => {
     ev.preventDefault();
     const e = validate();
-    if (Object.keys(e).length) {
-      setErrors(e);
-      return;
-    }
+    if (Object.keys(e).length) { setErrors(e); return; }
     setSaving(true);
+
+    const filteredImages = (form.images ?? []).filter(Boolean);
+    // colors aligned to images — only keep slots that have an image
+    const alignedColors = filteredImages.map((_, i) => form.colors[i] ?? null);
+
     await onSubmit({
       ...form,
-      price: +form.price,
-      oldPrice: form.oldPrice ? +form.oldPrice : null,
+      price:    Math.floor(+form.price),
+      oldPrice: form.oldPrice ? Math.floor(+form.oldPrice) : null,
       discount: form.discount ? +form.discount : 0,
-      rating: form.rating ? +form.rating : 0,
-      stock: form.stock ? +form.stock : 0,
-      sizes: form.sizes
-        .split(",")
-        .map((s) => s.trim())
-        .filter(Boolean),
-      colors: form.colors, // already an array of hex strings
-      images: (form.images ?? []).filter(Boolean),
+      rating:   form.rating   ? +form.rating   : 0,
+      stock:    form.stock    ? +form.stock    : 0,
+      sizes:    form.sizes.split(",").map((s) => s.trim()).filter(Boolean),
+      colors:   alignedColors,
+      images:   filteredImages,
     });
     setSaving(false);
   };
@@ -797,21 +876,13 @@ function ProductForm({ initial, onSubmit, onCancel }) {
   return (
     <div>
       <div className="flex items-center gap-4 mb-6">
-        <button onClick={onCancel} className="text-black/40 hover:text-black text-xl">
-          ←
-        </button>
-        <PageHeader
-          title={initial ? "Edit Product" : "Add Product"}
-          sub="Saved to MongoDB"
-          compact
-        />
+        <button onClick={onCancel} className="text-black/40 hover:text-black text-xl">←</button>
+        <PageHeader title={initial ? "Edit Product" : "Add Product"} sub="Saved to MongoDB" compact />
       </div>
 
-      <form
-        onSubmit={submit}
-        className="bg-white border border-black/10 p-4 md:p-8 max-w-3xl"
-      >
+      <form onSubmit={submit} className="bg-white border border-black/10 p-4 md:p-8 max-w-3xl">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
+
           <Field label="Title *" error={errors.title} span2>
             <input
               value={form.title}
@@ -823,9 +894,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
 
           <Field label="Price ($) *" error={errors.price}>
             <input
-              type="number"
-              min="0"
-              step="1"
+              type="number" min="0" step="1"
               value={form.price}
               onChange={(e) => set("price", e.target.value)}
               placeholder="0000"
@@ -835,9 +904,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
 
           <Field label="Old Price ($)">
             <input
-              type="number"
-              min="0"
-              step="1"
+              type="number" min="0" step="1"
               value={form.oldPrice}
               onChange={(e) => set("oldPrice", e.target.value)}
               placeholder="0000"
@@ -847,9 +914,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
 
           <Field label="Discount (%)">
             <input
-              type="number"
-              min="0"
-              max="100"
+              type="number" min="0" max="100"
               value={form.discount}
               onChange={(e) => set("discount", e.target.value)}
               placeholder="20"
@@ -868,8 +933,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
 
           <Field label="Stock">
             <input
-              type="number"
-              min="0"
+              type="number" min="0"
               value={form.stock}
               onChange={(e) => set("stock", e.target.value)}
               placeholder="100"
@@ -879,10 +943,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
 
           <Field label="Rating (0–5)">
             <input
-              type="number"
-              min="0"
-              max="5"
-              step="0.1"
+              type="number" min="0" max="5" step="0.1"
               value={form.rating}
               onChange={(e) => set("rating", e.target.value)}
               placeholder="4.5"
@@ -890,6 +951,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
             />
           </Field>
 
+          {/* Images */}
           {[0, 1, 2].map((i) => (
             <CloudinaryImageUpload
               key={i}
@@ -900,25 +962,28 @@ function ProductForm({ initial, onSubmit, onCancel }) {
                 const imgs = [...(form.images ?? ["", "", ""])];
                 imgs[i] = url;
                 set("images", imgs);
+                // If image removed, clear its color slot
+                if (!url) {
+                  const cols = [...(form.colors ?? [null, null, null])];
+                  cols[i] = null;
+                  set("colors", cols);
+                }
               }}
             />
           ))}
 
+          {/* Image previews */}
           {(form.images ?? []).some(Boolean) && (
             <div className="md:col-span-2 flex gap-2 flex-wrap">
               {(form.images ?? []).map((url, i) =>
                 url ? (
-                  <div
-                    key={i}
-                    className="flex-1 min-w-[80px] border border-black/10 overflow-hidden"
-                  >
-                    <img
-                      src={url}
-                      alt={`gallery-${i + 1}`}
-                      className="w-full h-24 md:h-28 object-cover"
-                    />
-                    <div className="px-2 py-1 bg-black/3 text-xs text-black/35">
+                  <div key={i} className="flex-1 min-w-[80px] border border-black/10 overflow-hidden">
+                    <img src={url} alt={`gallery-${i + 1}`} className="w-full h-24 md:h-28 object-cover" />
+                    <div className="px-2 py-1 bg-black/3 text-xs text-black/35 flex items-center gap-1.5">
                       Image {i + 1}
+                      {form.colors?.[i] && (
+                        <span className="w-3 h-3 rounded-full border border-black/10 inline-block" style={{ background: form.colors[i] }} />
+                      )}
                     </div>
                   </div>
                 ) : null
@@ -935,9 +1000,11 @@ function ProductForm({ initial, onSubmit, onCancel }) {
             />
           </Field>
 
-          <Field label="Colors">
+          {/* Color picker — image-linked */}
+          <Field label="Colors (per image)" span2>
             <ColorPicker
-              value={form.colors}
+              value={form.colors ?? [null, null, null]}
+              images={form.images ?? ["", "", ""]}
               onChange={(v) => set("colors", v)}
             />
           </Field>
@@ -953,24 +1020,18 @@ function ProductForm({ initial, onSubmit, onCancel }) {
           </Field>
 
           <div className="md:col-span-2">
-            <Toggle
-              label="Feature on homepage"
-              value={form.featured}
-              onChange={(v) => set("featured", v)}
-            />
+            <Toggle label="Feature on homepage" value={form.featured} onChange={(v) => set("featured", v)} />
           </div>
 
           <div className="md:col-span-2 flex flex-wrap gap-3 pt-4 border-t border-black/10">
             <button
-              type="submit"
-              disabled={saving}
+              type="submit" disabled={saving}
               className="bg-black text-white font-bold px-6 md:px-8 py-3 text-sm hover:bg-black/80 disabled:opacity-50 transition-all uppercase tracking-wide"
             >
               {saving ? "Saving…" : initial ? "Save Changes" : "Add to Shop"}
             </button>
             <button
-              type="button"
-              onClick={onCancel}
+              type="button" onClick={onCancel}
               className="border border-black/20 text-black/60 px-5 md:px-6 py-3 text-sm font-medium hover:border-black hover:text-black transition-all"
             >
               Cancel
@@ -981,6 +1042,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
     </div>
   );
 }
+
 /* ═══════════════════════════════════════════════════════════════
    USERS
 ═══════════════════════════════════════════════════════════════ */
@@ -1022,7 +1084,6 @@ function UsersTab({ toast }) {
 
       {loading ? <Skeleton rows={5} /> : (
         <Card>
-          {/* Mobile cards */}
           <div className="md:hidden divide-y divide-black/6">
             {users.map((u, i) => (
               <div key={i} className="p-4">
@@ -1051,7 +1112,6 @@ function UsersTab({ toast }) {
             {users.length === 0 && <p className="p-8 text-center text-black/30 text-sm">No users found</p>}
           </div>
 
-          {/* Desktop table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -1130,7 +1190,6 @@ function AnalyticsTab({ toast }) {
 
       {loading ? <Skeleton rows={8} /> : data && (
         <div className="space-y-5">
-          {/* KPI cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { label: "Revenue",   value: fmt(data.stats.revenue),  pct: data.stats.revenuePct },
@@ -1146,12 +1205,10 @@ function AnalyticsTab({ toast }) {
             ))}
           </div>
 
-          {/* Bar chart */}
           <Card title={`Daily Revenue — Last ${period} days`}>
             <div className="px-4 md:px-5 pb-5 pt-2"><BarChart data={data.dailyRevenue} /></div>
           </Card>
 
-          {/* Status + Top products */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Card title="Delivery Status Breakdown">
               {data.statusBreakdown.map((s, i) => (
