@@ -36,7 +36,7 @@ export async function PATCH(req, context) {
     if (!verifyAdmin(req)) return Response.json({ success: false, message: "Unauthorized" }, { status: 401 });
 
     const { id } = await context.params;
-
+console.log(id)
     const updates = await req.json();
     if (updates.price    != null) updates.price    = Number(updates.price);
     if (updates.oldPrice != null) updates.oldPrice = Number(updates.oldPrice);

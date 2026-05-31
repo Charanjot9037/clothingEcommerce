@@ -534,6 +534,7 @@ function ProductsTab({ toast }) {
   };
 
   const handleSave = async (payload, id) => {
+    console.log("id",id)
     const url  = id ? `/api/products/${id}` : "/api/products";
     const res  = await fetch(url, { method: id ? "PATCH" : "POST", headers: authHeaders(), body: JSON.stringify(payload) });
     const data = await res.json();
@@ -728,7 +729,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
   const blank = {
     title: "",
     price: "",
-    oldPrice: "",
+
     discount: "",
     category: "",
     images: ["", "", ""],
@@ -759,7 +760,12 @@ function ProductForm({ initial, onSubmit, onCancel }) {
     setForm((f) => ({ ...f, [k]: v }));
     setErrors((e) => ({ ...e, [k]: null }));
   };
-
+  const calcDiscount = (price, oldPrice) => {
+    const p = +price;
+    const op = +oldPrice;
+    if (!p || !op || op <= p) return 0;
+    return Math.round(((op - p) / op) * 100);
+  };
   const validate = () => {
     const e = {};
     if (!form.title.trim()) e.title = "Required";
@@ -781,7 +787,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
       ...form,
       price: +form.price,
       oldPrice: form.oldPrice ? +form.oldPrice : null,
-      discount: form.discount ? +form.discount : 0,
+      discount: calcDiscount(form.price, form.oldPrice),
       rating: form.rating ? +form.rating : 0,
       stock: form.stock ? +form.stock : 0,
       sizes: form.sizes
