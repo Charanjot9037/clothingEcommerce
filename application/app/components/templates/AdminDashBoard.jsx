@@ -804,7 +804,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
   const blank = {
     title: "",
     price: "",
-
+ oldPrice: "",
     discount: "",
     category: "",
     images: ["", "", ""],
@@ -920,6 +920,19 @@ function ProductForm({ initial, onSubmit, onCancel }) {
               className={inp()}
             />
           </Field>
+          <Field label="Discount (auto)">
+  <div className="flex items-center h-10">
+    {form.price && form.oldPrice && +form.oldPrice > +form.price ? (
+      <span className="bg-black text-white text-sm font-bold px-3 py-1.5">
+        {calcDiscount(form.price, form.oldPrice)}% OFF
+      </span>
+    ) : (
+      <span className="text-xs text-black/30 italic">
+        Enter old &amp; new price to calculate
+      </span>
+    )}
+  </div>
+</Field>
 
        
 
