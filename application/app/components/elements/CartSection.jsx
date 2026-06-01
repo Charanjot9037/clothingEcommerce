@@ -151,56 +151,96 @@ const [address, setAddress] = useState({
 
   // ─── STRIPE CHECKOUT ───────────────────────────────────────────────────────
   const handleCheckout = async () => {
-    const token = getToken(); if (!token) return;
-     const error = validateAddress();
+  const token = getToken();
+  if (!token) return;
+
+  const error = validateAddress();
   if (error) {
     alert(error);
     return;
   }
-    setCheckoutLoading(true);
-    try {
-      // 1. Create Stripe checkout session
-      const res = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, discount, deliveryFee: DELIVERY_FEE }),
-      });
-      const data = await res.json();
-      console.log("data from checkout session API", data);
-      if (!data.url) throw new Error("Failed to create checkout session");
 
-      // 2. Save order to DB before redirecting
-      await fetch("/api/auth/orders", {
-        method: "POST",
-        headers: authHeaders(token, true),
-        body: JSON.stringify({
-          items,
-          address,
-          subtotal,
-          discount,
-          deliveryFee: DELIVERY_FEE,
-          total,
-          sessionId: data.url.split("cs_")[1]?.split("/")[0] ?? "",
-        }),
-      });
+  setCheckoutLoading(true);
+  try {
+    // 1. Create Stripe checkout session — pass everything needed for post-payment processing
+    const res = await fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items,
+        discount,
+        deliveryFee: DELIVERY_FEE,
+        address,       // ← pass address here so webhook can use it
+        subtotal,
+        total,
+        userId: getUserId(token),  // ← pass userId for webhook
+      }),
+    });
 
-      // 3. Clear cart
-      await fetch("/api/auth/cart/clear", {
-        method: "DELETE",
-        headers: authHeaders(token, true),
-        body: JSON.stringify({ userId: getUserId(token) }),
-      });
+    const data = await res.json();
+    if (!data.url) throw new Error("Failed to create checkout session");
 
-      // 4. Redirect to Stripe hosted checkout
-      window.location.href = data.url;
-    } catch (err) {
-      console.error("Checkout error:", err);
-      alert("Something went wrong. Please try again.");
-    } finally {
-      setCheckoutLoading(false);
-    }
-  };
-  // ───────────────────────────────────────────────────────────────────────────
+    // 2. Just redirect — order saving & cart clearing happens AFTER payment
+    window.location.href = data.url;
+
+  } catch (err) {
+    console.error("Checkout error:", err);
+    alert("Something went wrong. Please try again.");
+  } finally {
+    setCheckoutLoading(false);
+  }
+};
+  // const handleCheckout = async () => {
+  //   const token = getToken(); if (!token) return;
+  //    const error = validateAddress();
+  // if (error) {
+  //   alert(error);
+  //   return;
+  // }
+  //   setCheckoutLoading(true);
+  //   try {
+  //     // 1. Create Stripe checkout session
+  //     const res = await fetch("/api/stripe/checkout", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ items, discount, deliveryFee: DELIVERY_FEE }),
+  //     });
+  //     const data = await res.json();
+  //     console.log("data from checkout session API", data);
+  //     if (!data.url) throw new Error("Failed to create checkout session");
+
+  //     // 2. Save order to DB before redirecting
+  //     await fetch("/api/auth/orders", {
+  //       method: "POST",
+  //       headers: authHeaders(token, true),
+  //       body: JSON.stringify({
+  //         items,
+  //         address,
+  //         subtotal,
+  //         discount,
+  //         deliveryFee: DELIVERY_FEE,
+  //         total,
+  //         sessionId: data.url.split("cs_")[1]?.split("/")[0] ?? "",
+  //       }),
+  //     });
+
+  //     // 3. Clear cart
+  //     await fetch("/api/auth/cart/clear", {
+  //       method: "DELETE",
+  //       headers: authHeaders(token, true),
+  //       body: JSON.stringify({ userId: getUserId(token) }),
+  //     });
+
+  //     // 4. Redirect to Stripe hosted checkout
+  //     window.location.href = data.url;
+  //   } catch (err) {
+  //     console.error("Checkout error:", err);
+  //     alert("Something went wrong. Please try again.");
+  //   } finally {
+  //     setCheckoutLoading(false);
+  //   }
+  // };
+  // // ───────────────────────────────────────────────────────────────────────────
 
   const items          = cart?.items ?? [];
   const subtotal       = items.reduce((s, i) => s + i.price * i.quantity, 0);
