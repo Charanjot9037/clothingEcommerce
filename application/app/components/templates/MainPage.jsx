@@ -27,8 +27,8 @@ export default function MainPage() {
       try {
         setLoading(true);
         const [newRes, topRes] = await Promise.all([
-          fetch("/api/products?category=new-arrivals&limit=4"),
-          fetch("/api/products?category=top-selling&limit=4"),
+          fetch("/api/products?category=new-arrivals&limit=6"),
+          fetch("/api/products?category=top-selling&limit=6"),
         ])
         const newData = await newRes.json();
         const topData = await topRes.json();
