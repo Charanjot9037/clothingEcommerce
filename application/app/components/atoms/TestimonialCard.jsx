@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 
 export default function TestimonialCard({ name, review, rating }) {
   return (
-    <div className="w-full h-44  bg-white border rounded-2xl p-6 shadow-sm">
+    <div className="w-full bg-white border rounded-2xl p-6 shadow-sm">
       <div className="flex gap-1 mb-3 text-yellow-500">
         {Array.from({ length: rating }).map((_, i) => (
           <Star key={i} size={16} fill="currentColor" />
@@ -14,7 +14,7 @@ export default function TestimonialCard({ name, review, rating }) {
         <span className="text-green-500 text-sm">✔</span>
       </div>
 
-      <p className="text-sm text-gray-500 leading-relaxed">{review}</p>
+     <p className="text-sm text-gray-500 leading-relaxed line-clamp-3">{review}</p>
     </div>
   );
 }
