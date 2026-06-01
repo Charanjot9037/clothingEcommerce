@@ -10,7 +10,7 @@ export default function HeroSection({
   stats,
 }) {
   return (
-   <section className="bg-[url('/main/hero.jpg')] bg-cover bg-center  py-6 lg:py-25">
+  <section className="bg-[url('/main/hero.jpg')] bg-contain bg-no-repeat bg-center lg:bg-cover py-6 lg:py-25">
       <Wrapper>
         <div className="flex items-end  pt-1 lg:pt-2 justify-start w-full lg:w-1/2">
 
