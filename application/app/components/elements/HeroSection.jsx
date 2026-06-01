@@ -14,7 +14,7 @@ export default function HeroSection({
       <Wrapper>
         <div className="flex items-end  pt-1 lg:pt-2 justify-start w-full lg:w-1/2">
 
-          <div className=" lg:w-3/4">
+          <div className="w-8/12 lg:w-3/4">
 
             <h1 className=" text-2xl lg:text-6xl font-extrabold ">
               {title}

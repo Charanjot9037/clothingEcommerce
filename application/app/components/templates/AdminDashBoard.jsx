@@ -921,15 +921,7 @@ function ProductForm({ initial, onSubmit, onCancel }) {
             />
           </Field>
 
-          <Field label="Discount (%)">
-            <input
-              type="number" min="0" max="100"
-              value={form.discount}
-              onChange={(e) => set("discount", e.target.value)}
-              placeholder="20"
-              className={inp()}
-            />
-          </Field>
+       
 
           <Field label="Category *" error={errors.category}>
             <input
