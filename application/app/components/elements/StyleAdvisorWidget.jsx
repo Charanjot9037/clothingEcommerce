@@ -340,8 +340,7 @@ export default function StyleAdvisorWidget() {
     </div>
   );
 
-  const stepComponents = [<Step0 />, <Step1 />, <Step2 />, <Step3 />];
-
+const stepComponents = [Step0(), Step1(), Step2(), Step3()];
   return (
     <>
       {/* ── Floating Button ──────────────────────────── */}
