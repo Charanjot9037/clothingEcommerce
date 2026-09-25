@@ -6,6 +6,9 @@ import jwt from "jsonwebtoken";
 // GET /api/products — public, used by shop pages
 export async function GET(req) {
   try {
+
+
+    
     await connectDB();
 const REAL_CATEGORIES = ["men", "women", "kids"];
     const { searchParams } = new URL(req.url);

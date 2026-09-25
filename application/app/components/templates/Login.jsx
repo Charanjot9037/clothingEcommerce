@@ -14,27 +14,43 @@ export default function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.user.id);
-        window.location.href = data.isAdmin ? "/admin" : "/";
-      } else {
-        alert(data.message);
-      }
-    } finally {
-      setLoading(false);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  setLoading(true);
+
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Keep your existing authentication flow
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.user.id);
+
+      // Keep your existing redirect
+      window.location.href = data.isAdmin
+        ? "/admin"
+        : "/";
+    } else {
+      alert(data.message);
     }
-  };
+
+  } catch (error) {
+    console.error("Login error:", error);
+    alert("Something went wrong. Please try again.");
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
