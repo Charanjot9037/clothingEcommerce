@@ -10,6 +10,7 @@ export async function GET(req) {
 
     
     await connectDB();
+    console.log("i am called ")
 const REAL_CATEGORIES = ["men", "women", "kids"];
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");

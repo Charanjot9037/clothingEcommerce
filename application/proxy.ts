@@ -1,5 +1,3 @@
-// proxy.ts
-
 import { NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
@@ -9,7 +7,7 @@ export async function proxy(request: Request) {
 
   console.log("🔥 PROXY RUNNING:", pathname);
 
-  // Only protect admin pages and admin APIs
+  // Protect only admin pages and admin APIs
   if (
     !pathname.startsWith("/admin") &&
     !pathname.startsWith("/api/admin")
@@ -17,23 +15,40 @@ export async function proxy(request: Request) {
     return NextResponse.next();
   }
 
-  // Authorization header
+  // --------------------------------------------------
+  // 1. Get token from Authorization header OR cookie
+  // --------------------------------------------------
+
   const authHeader = request.headers.get("authorization");
 
-  // Get token from Authorization header OR cookie
-  const token =
-    authHeader?.split(" ")[1] ??
-    request.headers
-      .get("cookie")
-      ?.split(";")
-      .map((cookie) => cookie.trim())
-      .find((cookie) => cookie.startsWith("token="))
-      ?.split("=")
-      .slice(1)
-      .join("=");
+  let token: string | undefined;
 
-  // No token
+  if (authHeader?.startsWith("Bearer ")) {
+    token = authHeader.substring(7).trim();
+  } else {
+    token = request.headers
+      ? request.headers.get("cookie")
+        ? request.headers
+            .get("cookie")
+            ?.split(";")
+            .map((cookie) => cookie.trim())
+            .find((cookie) => cookie.startsWith("token="))
+            ?.substring("token=".length)
+        : undefined
+      : undefined;
+  }
+
+  console.log("TOKEN EXISTS:", !!token);
+  console.log("TOKEN TYPE:", typeof token);
+  console.log("TOKEN PARTS:", token?.split(".").length);
+
+  // --------------------------------------------------
+  // 2. No token
+  // --------------------------------------------------
+
   if (!token) {
+    console.log("❌ NO TOKEN");
+
     if (pathname.startsWith("/api/")) {
       return NextResponse.json(
         {
@@ -48,6 +63,34 @@ export async function proxy(request: Request) {
       new URL("/login", request.url)
     );
   }
+
+  // --------------------------------------------------
+  // 3. Basic JWT format validation
+  // --------------------------------------------------
+
+  const jwtParts = token.split(".");
+
+  if (jwtParts.length !== 3) {
+    console.log("❌ MALFORMED JWT");
+
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid token",
+        },
+        { status: 401 }
+      );
+    }
+
+    return NextResponse.redirect(
+      new URL("/login", request.url)
+    );
+  }
+
+  // --------------------------------------------------
+  // 4. Verify JWT
+  // --------------------------------------------------
 
   try {
     const secret = process.env.JWT_SECRET;
@@ -80,8 +123,13 @@ export async function proxy(request: Request) {
     console.log("✅ JWT VERIFIED");
     console.log("isAdmin:", payload.isAdmin);
 
-    // Check admin permission
-    if (!payload.isAdmin) {
+    // --------------------------------------------------
+    // 5. Check admin permission
+    // --------------------------------------------------
+
+    if (payload.isAdmin !== true) {
+      console.log("❌ USER IS NOT ADMIN");
+
       if (pathname.startsWith("/api/")) {
         return NextResponse.json(
           {
@@ -97,7 +145,12 @@ export async function proxy(request: Request) {
       );
     }
 
-    // Valid admin token
+    // --------------------------------------------------
+    // 6. Valid admin JWT
+    // --------------------------------------------------
+
+    console.log("✅ ADMIN AUTHORIZED");
+
     return NextResponse.next();
 
   } catch (error) {
@@ -107,7 +160,7 @@ export async function proxy(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          message: "Invalid token",
+          message: "Invalid or expired token",
         },
         { status: 401 }
       );
